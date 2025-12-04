@@ -1,0 +1,8 @@
+//
+// File created by:  xrun
+// Do not modify this file
+
+s1::(04Dec2025:14:08:32):( xrun design/seq_design.v testbench/seq_tb.v -access +rwc -gui )
+s2::(04Dec2025:15:07:03):( xrun -64bit -access +rwc -licqueue -uvm -work INCA_libs -top seq_tb design/seq_design.v testbench/seq_tb.v -elaborate )
+s3::(04Dec2025:15:07:25):( xrun -64bit -access +rwc -licqueue -uvm -work INCA_libs -top seq_tb design/seq_design.v testbench/seq_tb.v -elaborate )
+s4::(04Dec2025:15:08:22):( xrun -64bit -access +rwc -licqueue -uvm -work INCA_libs -top seq_tb design/seq_design.v testbench/seq_tb.v -elaborate )
