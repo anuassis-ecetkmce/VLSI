@@ -8,8 +8,8 @@ design/rtl/axi2apb_top.sv
 
 #INTERFACES
 IF_SRCS = \
-testbench/interfaces/axi_if.sv \
-testbench/interfaces/apb_if.sv
+uvm/interfaces/axi_if.sv \
+uvm/interfaces/apb_if.sv
 
 #UVM PACKAGES (ALWAYS BEFORE COMPONENTS)
 UVM_PKG_SRCS = \
