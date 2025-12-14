@@ -33,8 +33,30 @@ class axi_driver extends uvm_driver #(axi_transaction);
       // Get next AXI transaction from sequencer
       seq_item_port.get_next_item(tr);
 
-      // AXI4 protocol logic will be added here
-      // AW / W / B / AR / R (step by step)
+   
+      // AXI4 WRITE ADDRESS (AW) CHANNEL
+
+      if (tr.is_write) begin
+
+        // Drive AW signals from transaction
+        vif.AWID    <= tr.id;
+        vif.AWADDR  <= tr.addr;
+        vif.AWLEN   <= tr.len;
+        vif.AWSIZE  <= tr.size;
+        vif.AWBURST <= tr.burst;
+        vif.AWVALID <= 1'b1;
+
+        // Wait for AWREADY handshake
+        do begin
+          @(posedge vif.ACLK);
+        end while (vif.AWREADY !== 1'b1);
+
+        // Handshake complete, deassert AWVALID
+        vif.AWVALID <= 1'b0;
+
+      end
+
+      // W / B / AR / R will be added step by step
 
       // Notify sequencer that transaction is complete
       seq_item_port.item_done();
