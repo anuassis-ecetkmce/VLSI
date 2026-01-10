@@ -120,4 +120,11 @@ show_files:
 
 # Remove simulation outputs
 clean:
-	rm -rf $(WORKLIB) xrun.history xrun.log waves.shm *.shm *.key *.err
+	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err
+
+
+#commands to run the makefile
+# make clean - to clean the previous run output and log files
+# make complie - to compile the code the files
+# make run - to compile, elaborate and open the gui of the xcelium
+# make show_files - Design files, Testbench/UVM file, Useful for debugging compile order and 			    missing files.
