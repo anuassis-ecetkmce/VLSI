@@ -44,11 +44,11 @@ The environment follows standard UVM layered architecture:
 
 
 
-1. Test Layer &emsp;&emsp;	– Controls test scenarios and sequences.
-2. Environment Layer &emsp; – Integrates protocol agents and checking components.
-3. Agent Layer &emsp;&emsp;	– Encapsulates driver, sequencer, and monitor for each protocol.
-4. Transaction Layer &emsp; – Defines protocol-specific sequence items.
-5. Scoreboard &emsp;&emsp; – Compares AXI input transactions with APB output transactions.
+1. Test Layer &emsp;&emsp;– Controls test scenarios and sequences.
+2. Environment Layer &emsp;– Integrates protocol agents and checking components.
+3. Agent Layer &emsp;&emsp;– Encapsulates driver, sequencer, and monitor for each protocol.
+4. Transaction Layer &emsp;– Defines protocol-specific sequence items.
+5. Scoreboard &emsp;&emsp;– Compares AXI input transactions with APB output transactions.
 
 
 
