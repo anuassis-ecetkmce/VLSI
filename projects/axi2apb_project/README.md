@@ -61,7 +61,7 @@ The environment follows standard UVM layered architecture:
 
 
 Test
-
+```
  └── Environment
       ├── AXI Agent (Active)
       │     ├── Sequencer
@@ -70,7 +70,7 @@ Test
       ├── APB Agent (Passive)
       │     └── Monitor
       └── Scoreboard
-
+```
 
 
 ### 5\. File and Folder Structure
