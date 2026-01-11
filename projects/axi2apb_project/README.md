@@ -16,40 +16,26 @@
 
 ### 2\. Project Objective
 
-
-
 The primary objectives of this project are:
 
-
-
-* To design a reusable UVM-based verification environment for an AXI2APB bridge.
-* To generate AXI transactions and ensure correct translation into APB protocol.
-* To monitor both interfaces and verify:
-
- 	\* Address mapping
-
- 	\* Data integrity
-
- 	\* Read/Write direction correctness
-
- 	\*Response handling and error signaling
-
+- To design a reusable UVM-based verification environment for an AXI2APB bridge.
+- To generate AXI transactions and ensure correct translation into APB protocol.
+- To monitor both interfaces and verify:
+  - Address mapping  
+  - Data integrity  
+  - Read/Write direction correctness  
+  - Response handling and error signaling  
 
 
 ### 3\. Verification Methodology
 
-
-
 The environment follows standard UVM layered architecture:
 
-
-
-1. Test Layer &emsp;&emsp;– Controls test scenarios and sequences.
-2. Environment Layer &emsp;– Integrates protocol agents and checking components.
-3. Agent Layer &emsp;&emsp;– Encapsulates driver, sequencer, and monitor for each protocol.
-4. Transaction Layer &emsp;– Defines protocol-specific sequence items.
-5. Scoreboard &emsp;&emsp;– Compares AXI input transactions with APB output transactions.
-
+1. **Test Layer** – Controls test scenarios and sequences.
+2. **Environment Layer** – Integrates protocol agents and checking components.
+3. **Agent Layer** – Encapsulates driver, sequencer, and monitor for each protocol.
+4. **Transaction Layer** – Defines protocol-specific sequence items.
+5. **Scoreboard** – Compares AXI input transactions with APB output transactions.
 
 
 ### 4\. High-Level Architecture
@@ -59,11 +45,13 @@ The environment follows standard UVM layered architecture:
 ```
 Test
  └── Environment
-      ├── AXI Agent (Active)
+      ├── AXI Agent
       │     ├── Sequencer
       │     ├── Driver
       │     └── Monitor
-      ├── APB Agent (Passive)
+      ├── APB Agent
+      │     ├── Sequencer
+      │     ├── Driver
       │     └── Monitor
       └── Scoreboard
 ```
@@ -82,7 +70,7 @@ uvm/
 ├── env/                          // Environment and checking components
 │   ├── axi2apb_env.sv           // Integrates agents and scoreboard
 │   ├── axi2apb_scoreboard.sv    // Compares AXI and APB transactions
-│   └── axi2apb_cov.sv           // Functional coverage (optional)
+│   └── axi2apb_cov.sv           // Functional coverage
 │
 ├── tests/                        // Test cases
 │   ├── axi2apb_test_base.sv      // Base test class
@@ -123,61 +111,36 @@ uvm/
 ```
 
 
-
-
 ### 6\. Class Hierarchy Overview
 
 ##### AXI Side
 
 ```
-axi\_item\_base        → uvm\_sequence\_item
+axi\_item\_base         → uvm\_sequence\_item
+axi\_item\_drv          → axi\_item\_base
+axi\_item\_mon          → axi\_item\_base
 
-axi\_item\_drv         → axi\_item\_base
+axi\_sequencer          → uvm\_sequencer
+axi\_driver             → uvm\_driver
+axi\_monitor            → uvm\_monitor
 
-axi\_item\_mon         → axi\_item\_base
+axi\_sequence\_base     → uvm\_sequence
+axi\_sequence\_rw       → axi\_sequence\_base
+axi\_sequence\_random   → axi\_sequence\_base
 
-
-axi\_sequencer        → uvm\_sequencer
-
-axi\_driver           → uvm\_driver
-
-axi\_monitor          → uvm\_monitor
-
-
-
-axi\_sequence\_base    → uvm\_sequence
-
-axi\_sequence\_rw      → axi\_sequence\_base
-
-axi\_sequence\_random  → axi\_sequence\_base
-
-
-
-axi\_agent\_config     → uvm\_component
-
-axi\_agent            → uvm\_agent
-
-
+axi\_agent\_config      → uvm\_component
+axi\_agent              → uvm\_agent
+```
 
 ##### APB Side
+```
+apb\_item\_base         → uvm\_sequence\_item
+apb\_item\_mon          → apb\_item\_base
 
+apb\_sequencer          → uvm\_sequencer
+apb\_monitor            → uvm\_monitor
+apb\_driver             → uvm\_driver
 
-
-apb\_item\_base        → uvm\_sequence\_item
-
-apb\_item\_mon         → apb\_item\_base
-
-
-
-apb\_sequencer        → uvm\_sequencer
-
-apb\_monitor          → uvm\_monitor
-
-apb\_driver	     → uvm\_driver
-
-
-
-apb\_agent\_config     → uvm\_component
-
-apb\_agent            → uvm\_agent
+apb\_agent\_config      → uvm\_component
+apb\_agent              → uvm\_agent
 ```
