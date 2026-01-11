@@ -54,14 +54,10 @@ The environment follows standard UVM layered architecture:
 
 ### 4\. High-Level Architecture
 
-
-
 #### UVM Structure
 
-
-
-Test
 ```
+Test
  └── Environment
       ├── AXI Agent (Active)
       │     ├── Sequencer
@@ -75,77 +71,70 @@ Test
 
 ### 5\. File and Folder Structure
 
-
-
 The verification environment is organized for clarity, reusability, and scalability.
 
-
-
+```
 uvm/
-|
-├── tb/				// Top-level testbench
-|   └── testbench.sv		// DUT instantiation, interface binding, run\_test()
-|
-├── env/			// Environment and checking components
-|   ├── axi2apb\_env.sv		// Integrates agents and scoreboard
-|   ├── axi2apb\_scoreboard.sv	// Compares AXI and APB transactions
-|   └── axi2apb\_cov.sv		// Functional coverage (optional)
-|
-├── tests/			// Test cases
-|   ├── axi2apb\_test\_base.sv	// Base test class
-|   ├── axi2apb\_test\_rw.sv	// Read/Write test
-|   └── axi2apb\_test\_random.sv	// Randomized traffic test
-|
-├── axi\_vip/			// AXI verification IP
-|   ├── axi\_if.sv		// AXI interface
-|   ├── axi\_types.sv		// AXI typedefs, enums
-|   ├── axi\_agent\_config.sv	// Configuration object
-|   ├── axi\_agent.sv		// AXI agent
-|   ├── axi\_sequencer.sv	// Sequencer
-|   ├── axi\_driver.sv		// Driver
-|   ├── axi\_monitor.sv		// Monitor
-|   ├── axi\_item\_base.sv	// Base transaction
-|   ├── axi\_item\_drv.sv		// Driver transaction
-|   ├── axi\_item\_mon.sv		// Monitor transaction
-|   ├── axi\_sequence\_base.sv	// Base sequence
-|   ├── axi\_sequence\_rw.sv	// Read/Write sequence
-|   └── axi\_sequence\_random.sv	// Random traffic
-|
-├── apb\_vip/			// APB verification IP
-|  ├── apb\_if.sv		// APB interface
-|  ├── apb\_types.sv		// APB typedefs, enums
-|  ├── apb\_agent\_config.sv	// Configuration object
-|  ├── apb\_agent.sv		// APB agent
-|  ├── apb\_sequencer.sv		// Sequncer
-|  ├──  apb\_driver.sv		// Driver
-|  ├── apb\_monitor.sv		// Monitor
-|  ├── apb\_item\_base.sv		// Base transaction
-|  ├──	 apb\_item\_drv.sv	// Driver transaction
-|  └── apb\_item\_mon.sv		// Monitor transaction
-|
-└── packages/			// Package files
-   ├── axi\_pkg.sv		// AXI package
-   ├── apb\_pkg.sv		// APB package
-   └── axi2apb\_env\_pkg.sv	// Environment and test package
-
+│
+├── tb/                           // Top-level testbench
+│   └── testbench.sv             // DUT instantiation, interface binding, run_test()
+│
+├── env/                          // Environment and checking components
+│   ├── axi2apb_env.sv           // Integrates agents and scoreboard
+│   ├── axi2apb_scoreboard.sv    // Compares AXI and APB transactions
+│   └── axi2apb_cov.sv           // Functional coverage (optional)
+│
+├── tests/                        // Test cases
+│   ├── axi2apb_test_base.sv      // Base test class
+│   ├── axi2apb_test_rw.sv        // Read/Write test
+│   └── axi2apb_test_random.sv    // Randomized traffic test
+│
+├── axi_vip/                      // AXI verification IP
+│   ├── axi_if.sv                 // AXI interface
+│   ├── axi_types.sv              // AXI typedefs, enums
+│   ├── axi_agent_config.sv       // Configuration object
+│   ├── axi_agent.sv              // AXI agent
+│   ├── axi_sequencer.sv          // Sequencer
+│   ├── axi_driver.sv             // Driver
+│   ├── axi_monitor.sv            // Monitor
+│   ├── axi_item_base.sv          // Base transaction
+│   ├── axi_item_drv.sv           // Driver transaction
+│   ├── axi_item_mon.sv           // Monitor transaction
+│   ├── axi_sequence_base.sv      // Base sequence
+│   ├── axi_sequence_rw.sv        // Read/Write sequence
+│   └── axi_sequence_random.sv    // Random traffic
+│
+├── apb_vip/                      // APB verification IP
+│   ├── apb_if.sv                 // APB interface
+│   ├── apb_types.sv              // APB typedefs, enums
+│   ├── apb_agent_config.sv       // Configuration object
+│   ├── apb_agent.sv              // APB agent
+│   ├── apb_sequencer.sv          // Sequencer
+│   ├── apb_driver.sv             // Driver
+│   ├── apb_monitor.sv            // Monitor
+│   ├── apb_item_base.sv          // Base transaction
+│   ├── apb_item_drv.sv           // Driver transaction
+│   └── apb_item_mon.sv           // Monitor transaction
+│
+└── packages/                     // Package files
+    ├── axi_pkg.sv                // AXI package
+    ├── apb_pkg.sv                // APB package
+    └── axi2apb_env_pkg.sv        // Environment and test package
+```
 
 
 
 
 ### 6\. Class Hierarchy Overview
 
-
-
 ##### AXI Side
 
-
-
+```
 axi\_item\_base        → uvm\_sequence\_item
 
 axi\_item\_drv         → axi\_item\_base
 
 axi\_item\_mon         → axi\_item\_base
-
 
 
 axi\_sequencer        → uvm\_sequencer
@@ -191,4 +180,4 @@ apb\_driver	     → uvm\_driver
 apb\_agent\_config     → uvm\_component
 
 apb\_agent            → uvm\_agent
-
+```
