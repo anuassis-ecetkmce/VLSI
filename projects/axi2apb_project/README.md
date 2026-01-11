@@ -64,50 +64,50 @@ The verification environment is organized for clarity, reusability, and scalabil
 ```
 uvm/
 │
-├── tb/                           // Top-level testbench
-│   └── testbench.sv             // DUT instantiation, interface binding, run_test()
+├── tb/                             // Top-level testbench
+│   └── testbench.sv                // DUT instantiation, interface binding, run_test()
 │
-├── env/                          // Environment and checking components
-│   ├── axi2apb_env.sv           // Integrates agents and scoreboard
-│   ├── axi2apb_scoreboard.sv    // Compares AXI and APB transactions
-│   └── axi2apb_cov.sv           // Functional coverage
+├── env/                            // Environment and checking components
+│   ├── axi2apb_env.sv              // Integrates agents and scoreboard
+│   ├── axi2apb_scoreboard.sv       // Compares AXI and APB transactions
+│   └── axi2apb_cov.sv              // Functional coverage
 │
-├── tests/                        // Test cases
-│   ├── axi2apb_test_base.sv      // Base test class
-│   ├── axi2apb_test_rw.sv        // Read/Write test
-│   └── axi2apb_test_random.sv    // Randomized traffic test
+├── tests/                          // Test cases
+│   ├── axi2apb_test_base.sv        // Base test class
+│   ├── axi2apb_test_rw.sv          // Read/Write test
+│   └── axi2apb_test_random.sv      // Randomized traffic test
 │
-├── axi_vip/                      // AXI verification IP
-│   ├── axi_if.sv                 // AXI interface
-│   ├── axi_types.sv              // AXI typedefs, enums
-│   ├── axi_agent_config.sv       // Configuration object
-│   ├── axi_agent.sv              // AXI agent
-│   ├── axi_sequencer.sv          // Sequencer
-│   ├── axi_driver.sv             // Driver
-│   ├── axi_monitor.sv            // Monitor
-│   ├── axi_item_base.sv          // Base transaction
-│   ├── axi_item_drv.sv           // Driver transaction
-│   ├── axi_item_mon.sv           // Monitor transaction
-│   ├── axi_sequence_base.sv      // Base sequence
-│   ├── axi_sequence_rw.sv        // Read/Write sequence
-│   └── axi_sequence_random.sv    // Random traffic
+├── axi_vip/                        // AXI verification IP
+│   ├── axi_if.sv                   // AXI interface
+│   ├── axi_types.sv                // AXI typedefs, enums
+│   ├── axi_agent_config.sv         // Configuration object
+│   ├── axi_agent.sv                // AXI agent
+│   ├── axi_sequencer.sv            // Sequencer
+│   ├── axi_driver.sv               // Driver
+│   ├── axi_monitor.sv              // Monitor
+│   ├── axi_item_base.sv            // Base transaction
+│   ├── axi_item_drv.sv             // Driver transaction
+│   ├── axi_item_mon.sv             // Monitor transaction
+│   ├── axi_sequence_base.sv        // Base sequence
+│   ├── axi_sequence_rw.sv          // Read/Write sequence
+│   └── axi_sequence_random.sv      // Random traffic
 │
-├── apb_vip/                      // APB verification IP
-│   ├── apb_if.sv                 // APB interface
-│   ├── apb_types.sv              // APB typedefs, enums
-│   ├── apb_agent_config.sv       // Configuration object
-│   ├── apb_agent.sv              // APB agent
-│   ├── apb_sequencer.sv          // Sequencer
-│   ├── apb_driver.sv             // Driver
-│   ├── apb_monitor.sv            // Monitor
-│   ├── apb_item_base.sv          // Base transaction
-│   ├── apb_item_drv.sv           // Driver transaction
-│   └── apb_item_mon.sv           // Monitor transaction
+├── apb_vip/                        // APB verification IP
+│   ├── apb_if.sv                   // APB interface
+│   ├── apb_types.sv                // APB typedefs, enums
+│   ├── apb_agent_config.sv         // Configuration object
+│   ├── apb_agent.sv                // APB agent
+│   ├── apb_sequencer.sv            // Sequencer
+│   ├── apb_driver.sv               // Driver
+│   ├── apb_monitor.sv              // Monitor
+│   ├── apb_item_base.sv            // Base transaction
+│   ├── apb_item_drv.sv             // Driver transaction
+│   └── apb_item_mon.sv             // Monitor transaction
 │
-└── packages/                     // Package files
-    ├── axi_pkg.sv                // AXI package
-    ├── apb_pkg.sv                // APB package
-    └── axi2apb_env_pkg.sv        // Environment and test package
+└── packages/                       // Package files
+    ├── axi_pkg.sv                  // AXI package
+    ├── apb_pkg.sv                  // APB package
+    └── axi2apb_env_pkg.sv          // Environment and test package
 ```
 
 
@@ -116,31 +116,31 @@ uvm/
 ##### AXI Side
 
 ```
-axi\_item\_base         → uvm\_sequence\_item
-axi\_item\_drv          → axi\_item\_base
-axi\_item\_mon          → axi\_item\_base
+axi_item_base           → uvm_sequence_item
+axi_item_drv            → axi_item_base
+axi_item_mon            → axi_item_base
 
-axi\_sequencer          → uvm\_sequencer
-axi\_driver             → uvm\_driver
-axi\_monitor            → uvm\_monitor
+axi_sequencer           → uvm_sequencer
+axi_driver              → uvm_driver
+axi_monitor             → uvm_monitor
 
-axi\_sequence\_base     → uvm\_sequence
-axi\_sequence\_rw       → axi\_sequence\_base
-axi\_sequence\_random   → axi\_sequence\_base
+axi_sequence_base       → uvm_sequence
+axi_sequence_rw         → axi_sequence_base
+axi_sequence_random     → axi_sequence_base
 
-axi\_agent\_config      → uvm\_component
-axi\_agent              → uvm\_agent
+axi_agent_config        → uvm_component
+axi_agent               → uvm_agent
 ```
 
 ##### APB Side
 ```
-apb\_item\_base         → uvm\_sequence\_item
-apb\_item\_mon          → apb\_item\_base
+apb_item_base           → uvm_sequence_item
+apb_item_mon            → apb_item_base
 
-apb\_sequencer          → uvm\_sequencer
-apb\_monitor            → uvm\_monitor
-apb\_driver             → uvm\_driver
+apb_sequencer           → uvm_sequencer
+apb_monitor             → uvm_monitor
+apb_driver              → uvm_driver
 
-apb\_agent\_config      → uvm\_component
-apb\_agent              → uvm\_agent
+apb_agent_config        → uvm_component
+apb_agent               → uvm_agent
 ```
