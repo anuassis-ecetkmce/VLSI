@@ -8,7 +8,7 @@
 		import uvm_pkg::*;
 		import cfs_apb_pkg::*;
 
-		`include "cfs_algn_env.sv"
+		`include "cfs_bridge_env.sv"
 
 		
 	endpackage

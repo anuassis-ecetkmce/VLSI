@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `include "cfs_bridge_test_pkg.sv"
 
-module axi_apb_bridge_tb_top;
+module axi2apb_tb_top;
 
 //Imports / Includes
 import uvm_pkg::*;
