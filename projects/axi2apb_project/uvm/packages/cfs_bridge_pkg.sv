@@ -1,15 +1,14 @@
-`ifndef CFS_ALGN_PKG_SV
-	`define CFS_ALGN_PKG_SV
+`ifndef CFS_bridge_PKG_SV
+	`define CFS_bridge_PKG_SV
 	
 	`include "uvm_macros.svh"
 	`include "cfs_apb_pkg.sv"
 	
-	package cfs_algn_pkg;
+	package cfs_bridge_pkg;
 		import uvm_pkg::*;
 		import cfs_apb_pkg::*;
 
 		`include "cfs_bridge_env.sv"
-
 		
 	endpackage
 	

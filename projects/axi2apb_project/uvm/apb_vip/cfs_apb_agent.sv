@@ -23,7 +23,7 @@ class cfs_apb_agent extends uvm_agent;
         super.new(name, parent);
     endfunction
 
-    function void build_phase(uvm_build_phase phase);
+    function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
         // Get agent configuration from config_db
@@ -41,17 +41,18 @@ class cfs_apb_agent extends uvm_agent;
         end
     endfunction
 
-    function void connect_phase(uvm_connect_phase phase);
-        super.connect_phase(phase);
-
-        cfs_apb_vif vif;
+    function void connect_phase(uvm_phase phase);
+      	 cfs_apb_vif apb_vif;
+      
+      	super.connect_phase(phase);
         
-        if (!uvm_config_db#(virtual cfs_apb_vif)::get(this, "", "vif", vif)) begin
+      	if (!uvm_config_db#(cfs_apb_vif)::get(this, "", "apb_vif", apb_vif)) begin
             `uvm_fatal("APB_NO_VIF", "Could not get from the database the APB virtual interface")
         end
         else begin
-            agent_config.set_vif(vif);
+          agent_config.set_apb_vif(apb_vif);
         end
+      
         monitor.agent_config = agent_config;
 
         if(agent_config.get_active_passive() == UVM_ACTIVE) begin
@@ -61,7 +62,7 @@ class cfs_apb_agent extends uvm_agent;
         end
     endfunction
 
-    function void end_of_elaboration_phase(uvm_end_of_elaboration_phase phase);
+    function void end_of_elaboration_phase(uvm_phase phase);
         super.end_of_elaboration_phase(phase);
         `uvm_info(get_type_name(), $sformatf("APB Agent created: %s", get_full_name()), UVM_HIGH)
     endfunction
