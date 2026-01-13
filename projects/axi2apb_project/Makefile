@@ -5,10 +5,11 @@ APB_VIP_DIR   = $(UVM_DIR)/apb_vip
 AXI_VIP_DIR   = $(UVM_DIR)/axi_vip
 PKG_DIR       = $(UVM_DIR)/packages
 ENV_DIR       = $(UVM_DIR)/env
+TESTS_DIR     = $(UVM_DIR)/tests
 
 #DESIGN (RTL first)
 DESIGN_SRCS = \
-$(DESIGN_DIR)/rtl/axi2apb_top.sv \
+$(DESIGN_DIR)/dummy_rtl.sv \
 # Add other design files here
 
 #INTERFACES
@@ -51,9 +52,10 @@ INCDIRS = \
     INCDIRS = \
     +incdir+$(UVM_DIR) \
     +incdir+$(APB_VIP_DIR) \
-    +incdir+$(AXI_VIP_DIR) \   # <--- ADD THIS
+    +incdir+$(AXI_VIP_DIR) \
     +incdir+$(PKG_DIR) \
-    +incdir+$(ENV_DIR) \       # <--- ADD THIS
+    +incdir+$(ENV_DIR) \
+	+incdir+$(TESTS_DIR) \
     +incdir+$(TB_DIR) \
     +incdir+$(DESIGN_DIR)/rtl
 
