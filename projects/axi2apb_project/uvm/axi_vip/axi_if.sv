@@ -1,8 +1,17 @@
 `timescale 1ns/1ps
-interface axi_if #(parameter ADDR_W = 32, DATA_W = 32, ID_W = 4) (
-  input bit ACLK,
-  input bit ARESETn
+
+interface axi_if #(
+  parameter ADDR_W = 32,
+  parameter DATA_W = 32,
+  parameter ID_W   = 4
+)(
+  input  logic ACLK,
+  input  logic ARESETn
 );
+
+
+  // AXI4 Write Address Channel
+
 
   logic [ID_W-1:0]   AWID;
   logic [ADDR_W-1:0] AWADDR;
@@ -12,16 +21,28 @@ interface axi_if #(parameter ADDR_W = 32, DATA_W = 32, ID_W = 4) (
   logic              AWVALID;
   logic              AWREADY;
 
+ 
+  // AXI4 Write Data Channel
+
+
   logic [DATA_W-1:0]   WDATA;
   logic [DATA_W/8-1:0] WSTRB;
   logic                WLAST;
   logic                WVALID;
   logic                WREADY;
 
-  logic [ID_W-1:0]   BID;
-  logic [1:0]        BRESP;
-  logic              BVALID;
-  logic              BREADY;
+
+  // AXI4 Write Response Channel
+ 
+
+  logic [ID_W-1:0] BID;
+  logic [1:0]      BRESP;
+  logic            BVALID;
+  logic            BREADY;
+
+
+  // AXI4 Read Address Channel
+ 
 
   logic [ID_W-1:0]   ARID;
   logic [ADDR_W-1:0] ARADDR;
@@ -31,6 +52,10 @@ interface axi_if #(parameter ADDR_W = 32, DATA_W = 32, ID_W = 4) (
   logic              ARVALID;
   logic              ARREADY;
 
+  
+  // AXI4 Read Data Channel
+  
+
   logic [ID_W-1:0]   RID;
   logic [DATA_W-1:0] RDATA;
   logic [1:0]        RRESP;
@@ -38,11 +63,19 @@ interface axi_if #(parameter ADDR_W = 32, DATA_W = 32, ID_W = 4) (
   logic              RVALID;
   logic              RREADY;
 
+ 
+  // Clocking block (for race-free driving & sampling)
+  
   clocking cb @(posedge ACLK);
     input  ARESETn;
-    input  AWREADY, WREADY, BVALID, BRESP, BID;
-    input  ARREADY, RVALID, RDATA, RRESP, RLAST;
 
+    // Inputs sampled by master
+    input  AWREADY, WREADY;
+    input  BVALID, BRESP, BID;
+    input  ARREADY;
+    input  RVALID, RDATA, RRESP, RLAST;
+
+    // Outputs driven by master
     output AWID, AWADDR, AWLEN, AWSIZE, AWBURST, AWVALID;
     output WDATA, WSTRB, WLAST, WVALID;
     output BREADY;
@@ -50,24 +83,36 @@ interface axi_if #(parameter ADDR_W = 32, DATA_W = 32, ID_W = 4) (
     output RREADY;
   endclocking
 
+  
+  // Master modport
+  
+
   modport master (
     input  ACLK, ARESETn,
-    input  AWREADY, WREADY, BVALID, BRESP, BID,
-    input  ARREADY, RVALID, RDATA, RRESP, RLAST,
+    input  AWREADY, WREADY,
+    input  BVALID, BRESP, BID,
+    input  ARREADY,
+    input  RVALID, RDATA, RRESP, RLAST,
     output AWID, AWADDR, AWLEN, AWSIZE, AWBURST, AWVALID,
-    output WDATA, WSTRB, WLAST, WVALID, BREADY,
+    output WDATA, WSTRB, WLAST, WVALID,
+    output BREADY,
     output ARID, ARADDR, ARLEN, ARSIZE, ARBURST, ARVALID,
     output RREADY
   );
 
-  task automatic reset();
-    AWVALID = 0;
-    WVALID  = 0;
-    WLAST   = 0;
-    BREADY  = 0;
-    ARVALID = 0;
-    RREADY  = 0;
+  
+  // Reset task (clock-safe)
+ 
+
+  task automatic reset_signals();
+    @(posedge ACLK);
+    cb.AWVALID <= 1'b0;
+    cb.WVALID  <= 1'b0;
+    cb.WLAST   <= 1'b0;
+    cb.BREADY  <= 1'b0;
+    cb.ARVALID <= 1'b0;
+    cb.RREADY  <= 1'b0;
   endtask
 
-endinterface
+endinterface : axi_if
 
