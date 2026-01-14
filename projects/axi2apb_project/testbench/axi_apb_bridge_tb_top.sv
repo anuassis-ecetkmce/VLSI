@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `include "cfs_bridge_test_pkg.sv"
 
-module axi2apb_tb_top;
+module axi_apb_bridge_tb_top;
 
 //Imports / Includes
 import uvm_pkg::*;
@@ -14,9 +14,10 @@ logic axi_aclk;
 logic axi_aresetn;
 logic apb_pclk;
 logic apb_presetn;
+
 //Interface instances
-axi4_if	axi_if(.aclk(axi_clk), .aresetn(axi_resetn));
-apb_if	apb_if(.pclk(apb_pclk), .presetn(apb_presetn));
+axi4_if	axi_if(.aclk(axi_aclk), .aresetn(axi_aresetn));
+cfs_apb_if	apb_if(.pclk(apb_pclk), .presetn(apb_presetn));
 
 // DUT instantiation
 axi_apb_bridge #(
@@ -126,7 +127,7 @@ end
 // Simple behavioral APB slave (testbench slave)
 // - Responds to DUT APB master operations.
 // - Replace with a full UVM slave agent later.
-
+/*
 initial begin : tb_apb_responder
 	// local memory for slave
 	bit [31:0] mem [0:1023];
@@ -172,11 +173,15 @@ initial begin : tb_apb_responder
 		end
 	end
 end
-
+*/
 // UVM configuration: register virtual interfaces and basic config
 initial begin
+
+	$dumpfile("axi_apb_bridge_tb.vcd");
+	// dump the DUT, AXI and APB interface signals
+	$dumpvars(0, axi_apb_bridge_tb_top);
 	// Register interfaces so UVM components can get them via uvm_config_db in build_phase
-	uvm_config_db#(virtual apb_if)::set(null, "*", "apb_vif", apb_if);
+	uvm_config_db#(virtual cfs_apb_if)::set(null, "*", "apb_vif", apb_if);
 	uvm_config_db#(virtual axi4_if)::set(null, "*", "axi_vif", axi_if);
 
 	// Let APB agent be active (driver present). Set to 0 if monitor-only.
@@ -187,8 +192,8 @@ initial begin
 
 	// Run the UVM test (test name must match your test class string)
 	// You can change the test name to any test implemented in uvm/tests/
-	#200ns; // allow reset to settle
-	run_test("apb_smoke_test");
+	run_test("");
+
 end
 
 // Top-level simulation timeout: avoid infinite runs
@@ -197,13 +202,5 @@ initial begin
 	`uvm_fatal("TIMEOUT", "Top-level timeout: simulation exceeded 100 ms")
 end
 
-// Waveform dumping - selective to keep file small
-initial begin
-	`ifdef DUMP_VCD
-		$dumpfile("axi_apb_bridge_tb.vcd");
-		// dump the DUT, AXI and APB interface signals
-		$dumpvars(0, axi_apb_bridge_tb_top);
-		`endif
-	end
 
 endmodule
