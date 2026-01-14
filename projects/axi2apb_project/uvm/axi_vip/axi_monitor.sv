@@ -1,136 +1,114 @@
-`timescale 1ns/1ps
-import uvm_pkg::*;
+`ifndef AXI_MONITOR_SV
+`define AXI_MONITOR_SV
+
 `include "uvm_macros.svh"
-import axi_apb_pkg::*; // your package with axi_trans/apb_trans/axi2apb
+import uvm_pkg::*;
 
-// Simple AXI4-Lite style virtual interface
-interface axi4_if (input bit ACLK, input bit ARESETn);
-  // Address Read
-  logic          ARVALID;
-  logic          ARREADY;
-  logic [31:0]   ARADDR;
-  logic [3:0]    ARID;
+class axi_monitor extends uvm_component;
+  `uvm_component_utils(axi_monitor)
 
-  // Read Data
-  logic          RVALID;
-  logic          RREADY;
-  logic [31:0]   RDATA;
-  logic [1:0]    RRESP;
-  logic [3:0]    RID;
+  // Analysis port
+  uvm_analysis_port #(axi_transaction) axi_ap;
 
-  // Address Write
-  logic          AWVALID;
-  logic          AWREADY;
-  logic [31:0]   AWADDR;
-  logic [3:0]    AWID;
+  // Virtual interface
+  virtual axi_if vif;
 
-  // Write Data
-  logic          WVALID;
-  logic          WREADY;
-  logic [31:0]   WDATA;
-  logic [3:0]    WID;
-  logic [3:0]    WSTRB;
-
-  // Write response
-  logic          BVALID;
-  logic          BREADY;
-  logic [1:0]    BRESP;
-  logic [3:0]    BID;
-
-  // convenience tasks or signals can be added if desired
-endinterface : axi4_if
-
-
-// AXI monitor
-class axi4_monitor extends uvm_component;
-  `uvm_component_utils(axi4_monitor)
-
-  // Analysis ports for publishing observed transactions
-  uvm_analysis_port #(axi_trans) axi_ap;   // publishes captured AXI transactions
-  uvm_analysis_port #(apb_trans) apb_ap;   // publishes converted APB transactions
-
-  // Virtual interface handle
-  virtual axi4_if vif;
-
-  // constructor
-  function new(string name = "axi4_monitor", uvm_component parent = null);
+  // Constructor
+  function new(string name = "axi_monitor", uvm_component parent = null);
     super.new(name, parent);
-    axi_ap = new("axi_ap");
-    apb_ap = new("apb_ap");
+    axi_ap = new("axi_ap", this);
   endfunction
 
-  // get virtual interface from config DB (typical UVM pattern)
+  // Build phase
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    if (!uvm_config_db#(virtual axi4_if)::get(this, "", "vif", vif)) begin
-      `uvm_fatal("NOVIF", {"Virtual interface must be set in config DB: ", get_full_name()})
+    if (!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif)) begin
+      `uvm_fatal("NOVIF", "axi_if not set for axi_monitor")
     end
   endfunction
 
-  // main monitoring loop
+  // Run phase
   task run_phase(uvm_phase phase);
-    super.run_phase(phase);
+    axi_transaction tr;
 
-    // Wait until reset is de-asserted
-    wait (vif.ARESETn == 1);
+    // Wait for reset deassertion
+    wait (vif.ARESETn == 1'b1);
 
-    // forever sample on clock edge
     forever begin
       @(posedge vif.ACLK);
 
-      // Capture a write transaction when AWVALID & AWREADY AND WVALID & WREADY are accepted.
-      // AXI4-Lite: AW and W may happen in same or separate cycles; we keep it simple:
+      
+      // WRITE TRANSACTION MONITORING
+      
       if (vif.AWVALID && vif.AWREADY) begin
-        // either W might already be accepted same cycle or later.
-        axi_trans at = axi_trans::type_id::create("axi_write");
-        at.addr = vif.AWADDR;
-        at.id   = vif.AWID;
+        tr = axi_transaction::type_id::create("axi_wr_tr", this);
+        tr.is_write = 1;
+        tr.id       = vif.AWID;
+        tr.addr     = vif.AWADDR;
+        tr.len      = vif.AWLEN;
+        tr.size     = vif.AWSIZE;
+        tr.burst    = vif.AWBURST;
 
-        // Determine write data: prefer if WVALID & WREADY present now,
-        // otherwise wait for WVALID & WREADY
-        if (vif.WVALID && vif.WREADY) begin
-          at.data = vif.WDATA;
-          at.rw   = AXI_WRITE;
-          // publish immediately
-          axi_ap.write(at);
-          // publish converted APB trans
-          apb_ap.write(axi2apb(at));
-        end
-        else begin
-          // wait for WVALID & WREADY to capture write data
-          // Avoid infinite blocking: sample on next clock edges
-          forever begin
-            @(posedge vif.ACLK);
-            if (vif.WVALID && vif.WREADY) begin
-              at.data = vif.WDATA;
-              at.rw   = AXI_WRITE;
-              axi_ap.write(at);
-              apb_ap.write(axi2apb(at));
-              break;
-            end
-          end
-        end
-      end // if AW
+        tr.alloc_data_array();
 
-      // Capture a read address acceptance and the corresponding read data
-      if (vif.ARVALID && vif.ARREADY) begin
-        axi_trans at = axi_trans::type_id::create("axi_read");
-        at.addr = vif.ARADDR;
-        at.id   = vif.ARID;
-        at.rw   = AXI_READ;
+        int beats = tr.len + 1;
+        int beat  = 0;
 
-        // Wait for the read data beat (RVALID & RREADY). In AXI4-Lite single beat:
-        forever begin
+        // Capture write data beats
+        while (beat < beats) begin
           @(posedge vif.ACLK);
-          if (vif.RVALID && vif.RREADY && vif.RID == at.id) begin
-            at.data = vif.RDATA;
-            axi_ap.write(at);
-            apb_ap.write(axi2apb(at));
-            break;
+          if (vif.WVALID && vif.WREADY) begin
+            tr.data_ary[beat] = vif.WDATA;
+            beat++;
+            if (vif.WLAST)
+              break;
           end
         end
-      end // if AR
-    end // forever
+
+        // Capture response
+        @(posedge vif.ACLK);
+        wait (vif.BVALID);
+        tr.resp = vif.BRESP;
+
+        axi_ap.write(tr);
+      end
+
+      
+      // READ TRANSACTION MONITORING
+      
+      if (vif.ARVALID && vif.ARREADY) begin
+        tr = axi_transaction::type_id::create("axi_rd_tr", this);
+        tr.is_write = 0;
+        tr.id       = vif.ARID;
+        tr.addr     = vif.ARADDR;
+        tr.len      = vif.ARLEN;
+        tr.size     = vif.ARSIZE;
+        tr.burst    = vif.ARBURST;
+
+        tr.alloc_data_array();
+
+        int beats = tr.len + 1;
+        int beat  = 0;
+
+        // Capture read data beats
+        while (beat < beats) begin
+          @(posedge vif.ACLK);
+          if (vif.RVALID && vif.RREADY && vif.RID == tr.id) begin
+            tr.data_ary[beat] = vif.RDATA;
+            beat++;
+            if (vif.RLAST)
+              break;
+          end
+        end
+
+        tr.resp = vif.RRESP;
+        axi_ap.write(tr);
+      end
+    end
   endtask
 
-endclass : axi4_monitor
+endclass : axi_monitor
+
+`endif
+//AXI_MONITOR
+
