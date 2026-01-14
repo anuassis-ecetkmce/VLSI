@@ -14,7 +14,7 @@ $(DESIGN_DIR)/dummy_rtl.sv \
 
 #INTERFACES
 IF_SRCS = \
-    $(AXI_VIP_DIR)/axi_if.sv \
+    $(AXI_VIP_DIR)/axi4_if.sv \
     $(APB_VIP_DIR)/cfs_apb_if.sv \
 
 #UVM PACKAGES (ALWAYS BEFORE COMPONENTS)
@@ -44,17 +44,16 @@ WORKLIB = worklib
 
 # ---- Xcelium binary & options ----
 XRUN = xrun
-XRUN_COMMON = -64bit -access +rwc -licqueue
-XRUN_UVM = -uvm -uvmhome 1.2 # xcelium UVM switch (adjust if your version differs)
+XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps
+XRUN_UVM = -uvm -uvmhome CDNS-1.2 # xcelium UVM switch (adjust if your version differs)
 
 # We tell xrun to look inside these folders when it sees an `include "file.sv"
 INCDIRS = \
-    INCDIRS = \
     +incdir+$(UVM_DIR) \
     +incdir+$(APB_VIP_DIR) \
     +incdir+$(PKG_DIR) \
     +incdir+$(ENV_DIR) \
-	+incdir+$(TESTS_DIR) \
+    +incdir+$(TESTS_DIR) \
     +incdir+$(TB_DIR) \
     +incdir+$(DESIGN_DIR)
 #+incdir+$(AXI_VIP_DIR) \
