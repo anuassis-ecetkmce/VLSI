@@ -1,19 +1,29 @@
+`ifndef CFS_APB_PKG_SV
+`define CFS_APB_PKG_SV
+
+`include "uvm_macros.svh"
+`include "cfs_apb_if.sv"
+
 package cfs_apb_pkg;
 
 	// Import UVM
 	import uvm_pkg::*;
-	`include "uvm_macros.svh"
 
 	// Include all APB side files
-	`include "../apb/apb_if.sv"
-	`include "../apb/apb_agent.sv"
-	`include "../apb/apb_driver.sv"
-	`include "../apb/apb_monitor.sv"
-	`include "../apb/apb_sequencer.sv"
-	`include "../apb/apb_sequence.sv"
-	`include "../apb/apb_config.sv"
-	`include "../apb/apb_transaction.sv"
+	`include "cfs_apb_types.sv"
+	`include "cfs_apb_trans.sv"
+	`include "cfs_apb_item_drv.sv"
+	`include "cfs_apb_item_mon.sv"
+	`include "cfs_apb_agent_config.sv"
+	`include "cfs_apb_sequencer.sv"
+	`include "cfs_apb_driver.sv"
+	`include "cfs_apb_monitor.sv"
+	`include "cfs_apb_agent.sv"
+
+	`include "cfs_apb_sequence_base.sv"
 
 	// Add more includes as needed for all APB files
 
-endpackage : cfs_apb_pkg
+endpackage
+
+`endif
