@@ -21,8 +21,8 @@ IF_SRCS = \
 # UVM Packages
 PKG_SRCS = \
     $(PKG_DIR)/cfs_apb_pkg.sv \
-	$(PKG_DIR)/cfs_bridge_pkg.sv \
-	$(PKG_DIR)/cfs_bridge_test_pkg.sv \
+    $(PKG_DIR)/cfs_bridge_pkg.sv \
+    $(PKG_DIR)/cfs_bridge_test_pkg.sv \
 
 #TB TOP (LAST)
 TB_SRCS = \
@@ -45,19 +45,19 @@ WORKLIB = worklib
 # ---- Xcelium binary & options ----
 XRUN = xrun
 XRUN_COMMON = -64bit -access +rwc -licqueue
-XRUN_UVM = -uvm # xcelium UVM switch (adjust if your version differs)
+XRUN_UVM = -uvm -uvmhome 1.2 # xcelium UVM switch (adjust if your version differs)
 
 # We tell xrun to look inside these folders when it sees an `include "file.sv"
 INCDIRS = \
     INCDIRS = \
     +incdir+$(UVM_DIR) \
     +incdir+$(APB_VIP_DIR) \
-    +incdir+$(AXI_VIP_DIR) \
     +incdir+$(PKG_DIR) \
     +incdir+$(ENV_DIR) \
 	+incdir+$(TESTS_DIR) \
     +incdir+$(TB_DIR) \
-    +incdir+$(DESIGN_DIR)/rtl
+    +incdir+$(DESIGN_DIR)
+#+incdir+$(AXI_VIP_DIR) \
 
 
 # Extra arguments you might want:

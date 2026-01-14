@@ -5,8 +5,8 @@ module axi_apb_bridge_tb_top;
 
 //Imports / Includes
 import uvm_pkg::*;
-import cfs_test_pkg::*;
-`include "uvm_macro.svh";
+import cfs_bridge_test_pkg::*;
+`include "uvm_macros.svh"
 
 
 //Clock & Reset signals
@@ -16,8 +16,9 @@ logic apb_pclk;
 logic apb_presetn;
 
 //Interface instances
-axi4_if	axi_if(.aclk(axi_aclk), .aresetn(axi_aresetn));
-cfs_apb_if	apb_if(.pclk(apb_pclk), .presetn(apb_presetn));
+axi_if	axi_if(.aclk(axi_aclk));
+cfs_apb_if	apb_if(.pclk(apb_pclk));
+
 
 // DUT instantiation
 axi_apb_bridge #(

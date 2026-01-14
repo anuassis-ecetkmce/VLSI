@@ -21,7 +21,7 @@ class cfs_apb_trans extends uvm_sequence_item;
 
 	// Optionally add additional fields
 	rand bit               write_strobe;
-
+/*
 	// Constraints (if any)
 	constraint addr_c { addr inside {[0:2**`CFS_APB_MAX_ADDR_WIDTH-1]}; }
 	constraint wdata_c { wdata inside {[0:2**`CFS_APB_MAX_DATA_WIDTH-1]}; }
@@ -47,7 +47,7 @@ class cfs_apb_trans extends uvm_sequence_item;
 		response     = rhs_.response;
 		write_strobe = rhs_.write_strobe;
 	endfunction
-
+*/
 	// Convert2string for debug
 	function string convert2string();
 		
