@@ -8,32 +8,20 @@ class axi_agent extends uvm_agent;
 
   `uvm_component_utils(axi_agent)
 
-  
   // AXI agent components
- 
-
   axi_driver     driver;
   axi_sequencer  sequencer;
   axi_monitor    monitor;
 
-  
   // Configuration object
- 
-
   axi_agent_config cfg;
 
-  
   // Constructor
-  
-
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
-  
   // Build phase
-  
-
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
 
@@ -54,12 +42,16 @@ class axi_agent extends uvm_agent;
     end
   endfunction
 
-  
   // Connect phase
-  
-
   function void connect_phase(uvm_phase phase);
     super.connect_phase(phase);
+
+    // Pass virtual interface to sub-components
+    uvm_config_db#(virtual axi_if)::set(
+      this, "driver", "vif", cfg.vif);
+
+    uvm_config_db#(virtual axi_if)::set(
+      this, "monitor", "vif", cfg.vif);
 
     // Connect sequencer to driver only if active
     if (cfg.is_active == UVM_ACTIVE) begin
