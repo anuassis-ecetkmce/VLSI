@@ -3,7 +3,7 @@
 
 
 // APB Sequencer for AXI2APB bridge UVM environment
-class cfs_apb_sequencer extends uvm_sequencer #(cfs_apb_trans);
+class cfs_apb_sequencer extends uvm_sequencer #(cfs_apb_item_drv);
 
 	`uvm_component_utils(cfs_apb_sequencer)
 
