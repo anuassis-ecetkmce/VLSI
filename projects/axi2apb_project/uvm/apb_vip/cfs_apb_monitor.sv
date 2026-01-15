@@ -29,42 +29,42 @@ class cfs_apb_monitor extends uvm_monitor;
   endtask
   
   protected virtual task collect_transaction();
-  	cfs_apb_vif vif = agent_config.get_vif();
+  	cfs_apb_vif apb_vif = agent_config.get_apb_vif();
     cfs_apb_item_mon item = cfs_apb_item_mon::type_id::create("item");
     
-    while(vif.psel !== 1) begin
-      @(posedge vif.pclk);
+    while(apb_vif.psel !== 1) begin
+      @(posedge apb_vif.pclk);
       item.prev_item_delay++;
     end
     
-    item.addr = vif.paddr;
-    item.dir = cfs_apb_dir'(vif.pwrite);
+    item.addr = apb_vif.paddr;
+    item.dir = cfs_apb_dir'(apb_vif.pwrite);
     
     if(item.dir == CFS_APB_WRITE) begin
-      item.data = vif.pwdata;
+      item.wdata = apb_vif.pwdata;
     end
     
     item.length = 1;
     
-    @(posedge vif.pclk);
+    @(posedge apb_vif.pclk);
     item.length++;
     
-    while(vif.pready !== 1) begin
-      @(posedge vif.pclk);
+    while(apb_vif.pready !== 1) begin
+      @(posedge apb_vif.pclk);
       item.length++;
     end
     
-    item.response = cfs_apb_response'(vif.pslverr);
+    item.response = cfs_apb_response'(apb_vif.pslverr);
     
     if(item.dir == CFS_APB_READ) begin
-      item.data = vif.prdata;
+      item.rdata = apb_vif.prdata;
     end
 
     output_port.write(item);
     
     `uvm_info("DEBUG", $sformatf("Monitored item: Dir: \"%0s\", Addr: %0x%0s", item.dir.name(), item.addr,  item.convert2string()), UVM_NONE)
     
-    @(posedge vif.pclk);
+    @(posedge apb_vif.pclk);
     
   endtask
   

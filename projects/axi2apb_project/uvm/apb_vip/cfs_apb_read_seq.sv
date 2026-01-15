@@ -3,7 +3,7 @@
 
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "../transaction/cfs_apb_trans.sv"
+`include "cfs_apb_trans.sv"
 `include "cfs_apb_sequencer.sv"
 
 // APB Read Sequence for AXI2APB bridge UVM environment
