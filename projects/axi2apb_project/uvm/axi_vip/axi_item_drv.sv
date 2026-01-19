@@ -4,16 +4,18 @@
 `include "uvm_macros.svh"
 import uvm_pkg::*;
 import axi_types_pkg::*;
-`include "axi_item_base.sv"
+`include "axi_transaction.sv"
 
 /**
  * Driver-side AXI sequence item
  * - Extends axi_item_base
  * - Adds data array for writes
  */
-class axi_item_drv extends axi_item_base;
+class axi_item_drv extends axi_transaction;
 
-  `uvm_object_utils(axi_item_drv)
+  `uvm_object_utils_begin(axi_item_drv)
+  	`uvm_field_array_int(data_ary, UVM_ALL_ON)
+  `uvm_object_utils_end
 
   // Dynamic array for payload data (write data)
   bit [AXI_DATA_WIDTH-1:0] data_ary[];
@@ -41,7 +43,7 @@ class axi_item_drv extends axi_item_base;
   // - base fields are already included from axi_item_base
   // - add data_ary as dynamic array
   // -------------------------------------------------
-  `uvm_field_array_int(data_ary, UVM_ALL_ON)
+  
 
 endclass : axi_item_drv
 
