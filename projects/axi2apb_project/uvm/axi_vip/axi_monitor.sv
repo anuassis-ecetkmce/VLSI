@@ -6,12 +6,13 @@ import uvm_pkg::*;
 
 class axi_monitor extends uvm_component;
   `uvm_component_utils(axi_monitor)
+  axi_agent_config axi_cfg;
 
   // Analysis port
   uvm_analysis_port #(axi_transaction) axi_ap;
 
   // Virtual interface
-  virtual axi_if vif;
+  virtual axi_if axi_vif;
 
   // Constructor
   function new(string name = "axi_monitor", uvm_component parent = null);
@@ -22,7 +23,7 @@ class axi_monitor extends uvm_component;
   // Build phase
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    if (!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif)) begin
+    if (!uvm_config_db#(virtual axi_if)::get(this, "", "axi_vif", axi_vif)) begin
       `uvm_fatal("NOVIF", "axi_if not set for axi_monitor")
     end
   endfunction
@@ -30,45 +31,47 @@ class axi_monitor extends uvm_component;
   // Run phase
   task run_phase(uvm_phase phase);
     axi_transaction tr;
+    int beats;
+    int beat;
 
     // Wait for reset deassertion
-    wait (vif.ARESETn == 1'b1);
+    wait (axi_vif.ARESETn == 1'b1);
 
     forever begin
-      @(posedge vif.ACLK);
+      @(posedge axi_vif.ACLK);
 
       
       // WRITE TRANSACTION MONITORING
       
-      if (vif.AWVALID && vif.AWREADY) begin
+      if (axi_vif.AWVALID && axi_vif.AWREADY) begin
         tr = axi_transaction::type_id::create("axi_wr_tr", this);
         tr.is_write = 1;
-        tr.id       = vif.AWID;
-        tr.addr     = vif.AWADDR;
-        tr.len      = vif.AWLEN;
-        tr.size     = vif.AWSIZE;
-        tr.burst    = vif.AWBURST;
+        tr.id       = axi_vif.AWID;
+        tr.addr     = axi_vif.AWADDR;
+        tr.len      = axi_vif.AWLEN;
+        tr.size     = axi_vif.AWSIZE;
+        tr.burst    = axi_vif.AWBURST;
 
         tr.alloc_data_array();
 
-        int beats = tr.len + 1;
-        int beat  = 0;
+        beats = tr.len + 1;
+        beat  = 0;
 
         // Capture write data beats
         while (beat < beats) begin
-          @(posedge vif.ACLK);
-          if (vif.WVALID && vif.WREADY) begin
-            tr.data_ary[beat] = vif.WDATA;
+          @(posedge axi_vif.ACLK);
+          if (axi_vif.WVALID && axi_vif.WREADY) begin
+            tr.data_ary[beat] = axi_vif.WDATA;
             beat++;
-            if (vif.WLAST)
+            if (axi_vif.WLAST)
               break;
           end
         end
 
         // Capture response
-        @(posedge vif.ACLK);
-        wait (vif.BVALID);
-        tr.resp = vif.BRESP;
+        @(posedge axi_vif.ACLK);
+        wait (axi_vif.BVALID);
+        tr.resp = axi_vif.BRESP;
 
         axi_ap.write(tr);
       end
@@ -76,32 +79,32 @@ class axi_monitor extends uvm_component;
       
       // READ TRANSACTION MONITORING
       
-      if (vif.ARVALID && vif.ARREADY) begin
+      if (axi_vif.ARVALID && axi_vif.ARREADY) begin
         tr = axi_transaction::type_id::create("axi_rd_tr", this);
         tr.is_write = 0;
-        tr.id       = vif.ARID;
-        tr.addr     = vif.ARADDR;
-        tr.len      = vif.ARLEN;
-        tr.size     = vif.ARSIZE;
-        tr.burst    = vif.ARBURST;
+        tr.id       = axi_vif.ARID;
+        tr.addr     = axi_vif.ARADDR;
+        tr.len      = axi_vif.ARLEN;
+        tr.size     = axi_vif.ARSIZE;
+        tr.burst    = axi_vif.ARBURST;
 
         tr.alloc_data_array();
 
-        int beats = tr.len + 1;
-        int beat  = 0;
+        beats = tr.len + 1;
+        beat  = 0;
 
         // Capture read data beats
         while (beat < beats) begin
-          @(posedge vif.ACLK);
-          if (vif.RVALID && vif.RREADY && vif.RID == tr.id) begin
-            tr.data_ary[beat] = vif.RDATA;
+          @(posedge axi_vif.ACLK);
+          if (axi_vif.RVALID && axi_vif.RREADY && axi_vif.RID == tr.id) begin
+            tr.data_ary[beat] = axi_vif.RDATA;
             beat++;
-            if (vif.RLAST)
+            if (axi_vif.RLAST)
               break;
           end
         end
 
-        tr.resp = vif.RRESP;
+        tr.resp = axi_vif.RRESP;
         axi_ap.write(tr);
       end
     end
@@ -111,4 +114,5 @@ endclass : axi_monitor
 
 `endif
 //AXI_MONITOR
+
 

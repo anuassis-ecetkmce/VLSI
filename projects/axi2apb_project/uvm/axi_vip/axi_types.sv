@@ -2,9 +2,14 @@
 `ifndef AXI_TYPES_SV
 `define AXI_TYPES_SV
 
+	
 package axi_types_pkg;
-  // AXI basic parameters 
- 
+
+	//virtual interface type
+  	typedef virtual axi_if cfs_axi_vif;
+
+
+// AXI basic parameters
 
   parameter int AXI_ID_WIDTH    = 4;
   parameter int AXI_ADDR_WIDTH  = 32;
@@ -71,7 +76,8 @@ package axi_types_pkg;
     AXI_PROT_PRIV_NONSEC_INST    = 3'b111
   } axi_prot_t;
 
-endpackage : axi_types_pkg
+endpackage
 
 `endif // AXI_TYPES_SV
+
 
