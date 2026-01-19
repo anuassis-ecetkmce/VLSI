@@ -7,14 +7,17 @@ import axi_types_pkg::*;
 
 // Monitor-side AXI item class
 class axi_item_mon extends axi_transaction;
-
-  `uvm_object_utils(axi_item_mon)
-
+  
   // Time when this transaction was observed
   time signed   timestamp;
 
   // Optional - track if this was accepted by ready/valid handshake
   bit           accepted;
+
+  `uvm_object_utils_begin(axi_item_mon)
+  	`uvm_field_int(timestamp, UVM_ALL_ON)
+    `uvm_field_int(accepted,  UVM_ALL_ON)
+  `uvm_object_utils_end
 
   // Constructor
   function new(string name = "axi_item_mon");
@@ -42,12 +45,7 @@ class axi_item_mon extends axi_transaction;
   endfunction
 
   // Register fields for automation (optional dynamic array not printed)
-  `uvm_field_int(timestamp, UVM_ALL_ON)
-  `uvm_field_int(accepted,  UVM_ALL_ON)
-  `uvm_field_enum(axi_resp_t, resp, UVM_ALL_ON)
-  `uvm_field_int(addr,      UVM_ALL_ON)
-  `uvm_field_int(id,        UVM_ALL_ON)
-  `uvm_field_int(is_write,  UVM_ALL_ON)
+  
 
 endclass : axi_item_mon
 
