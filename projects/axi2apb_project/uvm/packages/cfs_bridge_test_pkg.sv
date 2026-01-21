@@ -3,11 +3,13 @@
 	
 	`include "uvm_macros.svh"
 	`include "cfs_bridge_pkg.sv"
+	`include "axi_pkg.sv"
 	
 	package cfs_bridge_test_pkg;
 		import uvm_pkg::*;
 		import cfs_bridge_pkg::*;
 		import cfs_apb_pkg::*;
+		import axi_pkg::*;
 
 		`include "cfs_bridge_test_base.sv"
 		`include "cfs_bridge_test_reg_access.sv"

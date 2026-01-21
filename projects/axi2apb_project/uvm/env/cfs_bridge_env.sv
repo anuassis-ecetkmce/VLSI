@@ -3,6 +3,7 @@
 	
 	class cfs_bridge_env extends uvm_env;
       	cfs_apb_agent apb_agent;
+      	axi_agent axi_agent1;
 	
 		`uvm_component_utils(cfs_bridge_env)
 	
@@ -14,6 +15,7 @@
         super.build_phase(phase);
         
           apb_agent = cfs_apb_agent::type_id::create("apb_agent", this);
+          axi_agent1 = axi_agent::type_id::create("axi_agent", this);
         
       endfunction
 	
