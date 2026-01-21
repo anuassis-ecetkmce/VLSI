@@ -4,7 +4,7 @@
 class cfs_apb_driver extends uvm_driver #(cfs_apb_item_drv);
     `uvm_component_utils(cfs_apb_driver)
 
-    cfs_apb_agent_config agent_config;
+    cfs_apb_agent_config apb_agent_config;
   	cfs_apb_vif apb_vif;
 
     function new(string name, uvm_component parent);
@@ -19,7 +19,7 @@ class cfs_apb_driver extends uvm_driver #(cfs_apb_item_drv);
 
     protected virtual task drive_transactions();
       
- 	    cfs_apb_vif apb_vif = agent_config.get_apb_vif();
+ 	    cfs_apb_vif apb_vif = apb_agent_config.get_apb_vif();
 
         // Reset signals
         apb_vif.penable <= 0;

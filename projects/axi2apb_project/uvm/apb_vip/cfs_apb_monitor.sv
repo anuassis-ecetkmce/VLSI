@@ -6,7 +6,7 @@ class cfs_apb_monitor extends uvm_monitor;
   uvm_analysis_port#(cfs_apb_item_mon) output_port;
   
   //pointer to the agent configuration
-  cfs_apb_agent_config agent_config;
+  cfs_apb_agent_config apb_agent_config;
   
   `uvm_component_utils(cfs_apb_monitor)
   
@@ -29,7 +29,7 @@ class cfs_apb_monitor extends uvm_monitor;
   endtask
   
   protected virtual task collect_transaction();
-  	cfs_apb_vif apb_vif = agent_config.get_apb_vif();
+  	cfs_apb_vif apb_vif = apb_agent_config.get_apb_vif();
     cfs_apb_item_mon item = cfs_apb_item_mon::type_id::create("item");
     
     while(apb_vif.psel !== 1) begin

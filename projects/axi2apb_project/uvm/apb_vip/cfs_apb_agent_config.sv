@@ -72,7 +72,7 @@ class cfs_apb_agent_config extends uvm_component;
     virtual function void start_of_simulation_phase(uvm_phase phase);
         super.start_of_simulation_phase(phase);
         
-      if(get_apb_vif == null) begin
+      if(get_apb_vif() == null) begin
           `uvm_fatal("ALGORITHM_ISSUE", "the APB virtual interface is not configured at \"start of simulation\" phase")
         end
         else begin
