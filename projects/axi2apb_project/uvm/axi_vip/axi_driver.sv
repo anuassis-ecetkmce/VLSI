@@ -1,15 +1,17 @@
 `ifndef AXI_DRIVER_SV
 `define AXI_DRIVER_SV
 
-`timescale 1ns/1ps
 `include "uvm_macros.svh"
 import uvm_pkg::*;
 
 class axi_driver extends uvm_driver #(axi_transaction);
+  
+    axi_agent_config axi_cfg;
+
   `uvm_component_utils(axi_driver)
 
   // AXI master virtual interface
-  virtual axi_if vif;
+  virtual axi_if axi_vif;
 
   // Constructor
   function new(string name = "axi_driver", uvm_component parent = null);
@@ -19,7 +21,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
   // Build phase
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    if (!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif)) begin
+    if (!uvm_config_db#(virtual axi_if)::get(this, "", "axi_vif", axi_vif)) begin
       `uvm_fatal("NOVIF", "axi_if not set for axi_driver")
     end
   endfunction
@@ -27,7 +29,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
   // Reset task
   task reset_phase(uvm_phase phase);
     phase.raise_objection(this);
-    vif.reset_signals();
+    axi_vif.reset_signals();
     phase.drop_objection(this);
   endtask
 
@@ -56,42 +58,42 @@ class axi_driver extends uvm_driver #(axi_transaction);
     // --------------------
     // WRITE ADDRESS (AW)
     // --------------------
-    @(vif.cb);
-    vif.cb.AWID    <= tr.id;
-    vif.cb.AWADDR  <= tr.addr;
-    vif.cb.AWLEN   <= tr.len;
-    vif.cb.AWSIZE  <= tr.size;
-    vif.cb.AWBURST <= tr.burst;
-    vif.cb.AWVALID <= 1'b1;
+    @(axi_vif.cb);
+    axi_vif.cb.AWID    <= tr.id;
+    axi_vif.cb.AWADDR  <= tr.addr;
+    axi_vif.cb.AWLEN   <= tr.len;
+    axi_vif.cb.AWSIZE  <= tr.size;
+    axi_vif.cb.AWBURST <= tr.burst;
+    axi_vif.cb.AWVALID <= 1'b1;
 
     // Wait for handshake
-    do @(vif.cb); while (!vif.cb.AWREADY);
-    vif.cb.AWVALID <= 1'b0;
+    do @(axi_vif.cb); while (!axi_vif.cb.AWREADY);
+    axi_vif.cb.AWVALID <= 1'b0;
 
     // --------------------
     // WRITE DATA (W)
     // --------------------
-    vif.cb.WVALID <= 1'b1;
+    axi_vif.cb.WVALID <= 1'b1;
 
     for (int i = 0; i < beats; i++) begin
-      @(vif.cb);
-      vif.cb.WDATA <= tr.data_ary[i];
-      vif.cb.WSTRB <= '1;
-      vif.cb.WLAST <= (i == beats - 1);
+      @(axi_vif.cb);
+      axi_vif.cb.WDATA <= tr.data_ary[i];
+      axi_vif.cb.WSTRB <= '1;
+      axi_vif.cb.WLAST <= (i == beats - 1);
 
-      do @(vif.cb); while (!vif.cb.WREADY);
+      do @(axi_vif.cb); while (!axi_vif.cb.WREADY);
     end
 
-    vif.cb.WVALID <= 1'b0;
-    vif.cb.WLAST  <= 1'b0;
+    axi_vif.cb.WVALID <= 1'b0;
+    axi_vif.cb.WLAST  <= 1'b0;
 
     // --------------------
     // WRITE RESPONSE (B)
     // --------------------
-    vif.cb.BREADY <= 1'b1;
-    do @(vif.cb); while (!vif.cb.BVALID);
-    tr.resp = vif.cb.BRESP;
-    vif.cb.BREADY <= 1'b0;
+    axi_vif.cb.BREADY <= 1'b1;
+    do @(axi_vif.cb); while (!axi_vif.cb.BVALID);
+    tr.resp = axi_vif.cb.BRESP;
+    axi_vif.cb.BREADY <= 1'b0;
   endtask
 
   // ============================================
@@ -104,34 +106,35 @@ class axi_driver extends uvm_driver #(axi_transaction);
     // --------------------
     // READ ADDRESS (AR)
     // --------------------
-    @(vif.cb);
-    vif.cb.ARID    <= tr.id;
-    vif.cb.ARADDR  <= tr.addr;
-    vif.cb.ARLEN   <= tr.len;
-    vif.cb.ARSIZE  <= tr.size;
-    vif.cb.ARBURST <= tr.burst;
-    vif.cb.ARVALID <= 1'b1;
+    @(axi_vif.cb);
+    axi_vif.cb.ARID    <= tr.id;
+    axi_vif.cb.ARADDR  <= tr.addr;
+    axi_vif.cb.ARLEN   <= tr.len;
+    axi_vif.cb.ARSIZE  <= tr.size;
+    axi_vif.cb.ARBURST <= tr.burst;
+    axi_vif.cb.ARVALID <= 1'b1;
 
-    do @(vif.cb); while (!vif.cb.ARREADY);
-    vif.cb.ARVALID <= 1'b0;
+    do @(axi_vif.cb); while (!axi_vif.cb.ARREADY);
+    axi_vif.cb.ARVALID <= 1'b0;
 
     // --------------------
     // READ DATA (R)
     // --------------------
-    vif.cb.RREADY <= 1'b1;
+    axi_vif.cb.RREADY <= 1'b1;
 
     for (int i = 0; i < beats; i++) begin
-      do @(vif.cb); while (!vif.cb.RVALID);
-      tr.data_ary[i] = vif.cb.RDATA;
-      if (vif.cb.RLAST)
+      do @(axi_vif.cb); while (!axi_vif.cb.RVALID);
+      tr.data_ary[i] = axi_vif.cb.RDATA;
+      if (axi_vif.cb.RLAST)
         break;
     end
 
-    tr.resp = vif.cb.RRESP;
-    vif.cb.RREADY <= 1'b0;
+    tr.resp = axi_vif.cb.RRESP;
+    axi_vif.cb.RREADY <= 1'b0;
   endtask
 
 endclass : axi_driver
 
 `endif
+
 
