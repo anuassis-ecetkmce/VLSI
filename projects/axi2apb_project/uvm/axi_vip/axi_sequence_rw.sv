@@ -1,9 +1,6 @@
 `ifndef AXI_SEQUENCE_RW_SV
 `define AXI_SEQUENCE_RW_SV
 
-`include "uvm_macros.svh"
-import uvm_pkg::*;
-import axi_types_pkg::*;
 
 class axi_sequence_rw extends uvm_sequence #(axi_transaction);
 
@@ -13,11 +10,15 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
   rand bit [31:0] base_addr;
   rand int unsigned num_trans;     // how many RW pairs
   rand bit [31:0] addr_stride;      // stride between addresses
+  
+  constraint num_trans_default {
+    num_trans inside{[1:10]};
+  }
 
   function new(string name = "axi_sequence_rw");
     super.new(name);
     base_addr   = 32'h1000;
-    num_trans   = 1;
+    //num_trans   = 1;
     addr_stride = 32'h4;
   endfunction
 
@@ -29,7 +30,8 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
     for (int unsigned i = 0; i < num_trans; i++) begin
 
       // ---- AXI WRITE ----
-      tr = axi_transaction::type_id::create($sformatf("axi_write_%0d", i), this);
+      axi_transaction tr = axi_transaction::type_id::create("axi_write");
+      
 
       // Write config
       tr.is_write = 1;
@@ -49,7 +51,7 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
       `uvm_info("AXI_SEQ_RW", $sformatf("Sent WRITE tr: addr=0x%0h data=0x%0h", tr.addr, tr.data_ary[0]), UVM_MEDIUM)
 
       // ---- AXI READ ----
-      tr = axi_transaction::type_id::create($sformatf("axi_read_%0d", i), this);
+      tr = axi_transaction::type_id::create("axi_read");
 
       tr.is_write = 0;
       tr.addr     = base_addr + (i * addr_stride);

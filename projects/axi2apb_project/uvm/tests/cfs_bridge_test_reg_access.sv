@@ -10,12 +10,23 @@
 		endfunction
 		
 		virtual task run_phase(uvm_phase phase);
+          
+          //create the sequence
+          axi_sequence_rw seq_rw = axi_sequence_rw::type_id::create("seq_rw");
 			
 			phase.raise_objection(this, "TEST_DONE");
 			
 			`uvm_info("DEBUG", "Start of test", UVM_LOW)
           
 			#100ns
+          
+          	fork
+          		begin
+              		void'(seq_rw.randomize() with{num_trans == 3;});
+              		seq_rw.start(env.axi_agent1.sequencer);
+            	end
+            join_any
+          
           /*fork
           	begin
               cfs_apb_sequence_simple seq_simple = cfs_apb_sequence_simple::type_id::create("seq_simple");

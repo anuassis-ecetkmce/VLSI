@@ -28,6 +28,7 @@ class cfs_apb_agent_config extends uvm_component;
     
     // Timing and behavior parameters
     bit enable_response_delay = 1;
+  	bit enable_random_delay = 1;
     int unsigned min_response_delay = 0;
     int unsigned max_response_delay = 10;
     
