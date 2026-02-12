@@ -4,7 +4,7 @@
 `include "uvm_macros.svh"
 import uvm_pkg::*;
 
-class axi_monitor extends uvm_component;
+class axi_monitor extends uvm_monitor;
   `uvm_component_utils(axi_monitor)
   axi_agent_config axi_cfg;
 
