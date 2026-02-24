@@ -8,7 +8,7 @@ class axi_sequencer extends uvm_sequencer #(axi_transaction);
 
   `uvm_component_utils(axi_sequencer)
 
- 
+
   // Constructor
 
 

@@ -5,11 +5,9 @@
 import uvm_pkg::*;
 
 class axi_transaction extends uvm_sequence_item;
-  `uvm_object_utils(axi_transaction)
-
 
   // AXI fields
- 
+
   rand bit [3:0]   id;
   rand bit [31:0]  addr;
   rand bit [7:0]   len;        // beats = len + 1
@@ -23,9 +21,21 @@ class axi_transaction extends uvm_sequence_item;
   // Response
   bit [1:0]        resp;
 
-  
+  // Field automation
+  `uvm_object_utils_begin(axi_transaction)
+    `uvm_field_int(id,       UVM_ALL_ON)
+    `uvm_field_int(addr,     UVM_ALL_ON)
+    `uvm_field_int(len,      UVM_ALL_ON)
+    `uvm_field_int(size,     UVM_ALL_ON)
+    `uvm_field_int(burst,    UVM_ALL_ON)
+    `uvm_field_int(is_write, UVM_ALL_ON)
+    `uvm_field_int(resp,     UVM_ALL_ON)
+    `uvm_field_array_int(data_ary, UVM_ALL_ON)
+  `uvm_object_utils_end
+
+
   // Constraints (CRITICAL)
-  
+
 
   // Reasonable burst length
   constraint c_len {
@@ -52,16 +62,16 @@ class axi_transaction extends uvm_sequence_item;
     data_ary.size() == (len + 1);
   }
 
-  
+
   // Constructor
-  
+
   function new(string name = "axi_transaction");
     super.new(name);
   endfunction
 
-  
+
   // Utility methods
-  
+
 
   function void alloc_data_array();
     data_ary.delete();
@@ -114,19 +124,6 @@ class axi_transaction extends uvm_sequence_item;
     return 1;
   endfunction
 
-  
-  // Field automation
-  
-  `uvm_field_int(id,       UVM_ALL_ON)
-  `uvm_field_int(addr,     UVM_ALL_ON)
-  `uvm_field_int(len,      UVM_ALL_ON)
-  `uvm_field_int(size,     UVM_ALL_ON)
-  `uvm_field_int(burst,    UVM_ALL_ON)
-  `uvm_field_int(is_write, UVM_ALL_ON)
-  `uvm_field_int(resp,     UVM_ALL_ON)
-  `uvm_field_array_int(data_ary, UVM_ALL_ON)
-
 endclass
 
 `endif
-

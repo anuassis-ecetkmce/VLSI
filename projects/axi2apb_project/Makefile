@@ -9,12 +9,14 @@ TESTS_DIR     = $(UVM_DIR)/tests
 
 #DESIGN (RTL first)
 DESIGN_SRCS = \
-$(DESIGN_DIR)/dummy_rtl.sv \
+$(DESIGN_DIR)/axi_apb_write_path_top.sv \
+$(DESIGN_DIR)/axi_input_stage.sv \
+$(DESIGN_DIR)/write_transaction_complete.sv \
 # Add other design files here
 
 #INTERFACES
 IF_SRCS = \
-    $(AXI_VIP_DIR)/axi4_if.sv \
+    $(AXI_VIP_DIR)/axi_if.sv \
     $(APB_VIP_DIR)/cfs_apb_if.sv \
 
 #UVM PACKAGES (ALWAYS BEFORE COMPONENTS)
@@ -55,8 +57,8 @@ INCDIRS = \
     +incdir+$(ENV_DIR) \
     +incdir+$(TESTS_DIR) \
     +incdir+$(TB_DIR) \
-    +incdir+$(DESIGN_DIR)
-#+incdir+$(AXI_VIP_DIR) \
+    +incdir+$(DESIGN_DIR) \
+    +incdir+$(AXI_VIP_DIR) \
 
 
 # Extra arguments you might want:

@@ -4,7 +4,7 @@
 `include "uvm_macros.svh"
 import uvm_pkg::*;
 
-class axi_monitor extends uvm_monitor;
+class axi_monitor extends uvm_component;
   `uvm_component_utils(axi_monitor)
   axi_agent_config axi_cfg;
 
@@ -40,9 +40,9 @@ class axi_monitor extends uvm_monitor;
     forever begin
       @(posedge axi_vif.ACLK);
 
-      
+
       // WRITE TRANSACTION MONITORING
-      
+
       if (axi_vif.AWVALID && axi_vif.AWREADY) begin
         tr = axi_transaction::type_id::create("axi_wr_tr", this);
         tr.is_write = 1;
@@ -76,9 +76,9 @@ class axi_monitor extends uvm_monitor;
         axi_ap.write(tr);
       end
 
-      
+
       // READ TRANSACTION MONITORING
-      
+
       if (axi_vif.ARVALID && axi_vif.ARREADY) begin
         tr = axi_transaction::type_id::create("axi_rd_tr", this);
         tr.is_write = 0;

@@ -27,75 +27,56 @@ axi_if axi_if (
 );
 
 cfs_apb_if apb_if (
-  .pclk(apb_pclk)
+  .pclk(axi_aclk)
 );
 
 // DUT instantiation
 
-axi_apb_bridge #(
-  .AXI_ADDR_WIDTH(32),
-  .AXI_DATA_WIDTH(32),
-  .AXI_ID_WIDTH(4)
+axi_apb_write_bridge_top #(
+  .ADDR_WIDTH(32),
+  .DATA_WIDTH(32),
+  .ID_WIDTH(4)
 ) DUT (
 
   // AXI clocks & resets
-  .axi_aclk    (axi_aclk),
-  .axi_aresetn (axi_aresetn),
+  .clk    	(axi_aclk),
+  .rst_n 	(axi_aresetn),
 
-  //AXI WRITE ADDRESS
-  .axi_awid    (axi_if.AWID),
-  .axi_awaddr  (axi_if.AWADDR),
-  .axi_awlen   (axi_if.AWLEN),
-  .axi_awsize  (axi_if.AWSIZE),
-  .axi_awburst (axi_if.AWBURST),
-  .axi_awvalid (axi_if.AWVALID),
-  .axi_awready (axi_if.AWREADY),
+  // AXI4 Write Address Channel
+  .awvalid     (axi_if.AWVALID),
+  .awready     (axi_if.AWREADY),
+  .awaddr      (axi_if.AWADDR),
+  .awsize      (axi_if.AWSIZE),
+  .awlen       (axi_if.AWLEN),
+  .awburst     (axi_if.AWBURST),
+  .awid        (axi_if.AWID),
 
-  //AXI WRITE DATA
-  .axi_wdata   (axi_if.WDATA),
-  .axi_wstrb   (axi_if.WSTRB),
-  .axi_wlast   (axi_if.WLAST),
-  .axi_wvalid  (axi_if.WVALID),
-  .axi_wready  (axi_if.WREADY),
+  // AXI4 Write Data Channel
+  .wvalid      (axi_if.WVALID),
+  .wready      (axi_if.WREADY),
+  .wdata       (axi_if.WDATA),
+  .wstrb       (axi_if.WSTRB),
+  .wlast       (axi_if.WLAST),
 
-  //AXI WRITE RESPONSE
-  .axi_bid     (axi_if.BID),
-  .axi_bresp   (axi_if.BRESP),
-  .axi_bvalid  (axi_if.BVALID),
-  .axi_bready  (axi_if.BREADY),
-
-  //AXI READ ADDRESS
-  .axi_arid    (axi_if.ARID),
-  .axi_araddr  (axi_if.ARADDR),
-  .axi_arlen   (axi_if.ARLEN),
-  .axi_arsize  (axi_if.ARSIZE),
-  .axi_arburst (axi_if.ARBURST),
-  .axi_arvalid (axi_if.ARVALID),
-  .axi_arready (axi_if.ARREADY),
-
-  //AXI READ DATA
-  .axi_rid     (axi_if.RID),
-  .axi_rdata   (axi_if.RDATA),
-  .axi_rresp   (axi_if.RRESP),
-  .axi_rlast   (axi_if.RLAST),
-  .axi_rvalid  (axi_if.RVALID),
-  .axi_rready  (axi_if.RREADY),
+  // AXI4 Write Response Channel
+  .bvalid      (axi_if.BVALID),
+  .bready      (axi_if.BREADY),
+  .bresp       (axi_if.BRESP),
+  .bid         (axi_if.BID),
 
   //APB CLOCK & RESET
-  .apb_pclk    (apb_pclk),
-  .apb_presetn (apb_presetn),
+  //.clk		(apb_pclk),
+  //.rst_n	(apb_presetn),
 
-  // APB SIGNALS 
-  .apb_paddr   (apb_if.paddr),
-  .apb_pprot   (apb_if.pprot),
-  .apb_psel    (apb_if.psel),
-  .apb_penable (apb_if.penable),
-  .apb_pwrite  (apb_if.pwrite),
-  .apb_pwdata  (apb_if.pwdata),
-  .apb_pstrb   (apb_if.pstrb),
-  .apb_pready  (apb_if.pready),
-  .apb_prdata  (apb_if.prdata),
-  .apb_pslverr (apb_if.pslverr)
+  // APB Master Interface
+  .psel        (apb_if.psel),
+  .penable     (apb_if.penable),
+  .paddr       (apb_if.paddr),
+  .pwdata      (apb_if.pwdata),
+  .pstrb       (apb_if.pstrb),
+  .pwrite      (apb_if.pwrite),
+  .pready      (apb_if.pready),
+  .pslverr     (apb_if.pslverr)
 );
 
 
@@ -106,22 +87,22 @@ initial begin
   forever #5 axi_aclk = ~axi_aclk; // 100 MHz
 end
 
-initial begin
-  apb_pclk = 0;
-  forever #5 apb_pclk = ~apb_pclk; // 100 MHz
-end
+//initial begin
+//  apb_pclk = 0;
+//  forever #5 apb_pclk = ~apb_pclk; // 100 MHz
+//end
 
 
 // Reset generation (active-low)
 
 initial begin
   axi_aresetn = 0;
-  apb_presetn = 0;
+  //apb_presetn = 0;
 
   repeat (20) @(posedge axi_aclk);
 
   axi_aresetn = 1;
-  apb_presetn = 1;
+  //apb_presetn = 1;
 end
 
 // UVM configuration & test start

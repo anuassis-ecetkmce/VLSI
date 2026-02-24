@@ -5,7 +5,7 @@
 import uvm_pkg::*;
 
 class axi_driver extends uvm_driver #(axi_transaction);
-  
+
     axi_agent_config axi_cfg;
 
   `uvm_component_utils(axi_driver)
@@ -136,5 +136,4 @@ class axi_driver extends uvm_driver #(axi_transaction);
 endclass : axi_driver
 
 `endif
-
 

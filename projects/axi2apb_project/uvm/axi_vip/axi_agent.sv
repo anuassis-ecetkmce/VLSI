@@ -38,7 +38,7 @@ class axi_agent extends uvm_agent;
     end
   endfunction
 
-  
+
   // Connect phase
   function void connect_phase(uvm_phase phase);
     virtual axi_if axi_vif;
@@ -55,21 +55,21 @@ class axi_agent extends uvm_agent;
     // Pass configuration to monitor
     monitor.axi_cfg = axi_cfg; // Assuming monitor has a 'cfg' handle
     // Pass virtual interface to monitor (if monitor uses it directly)
-    // monitor.vif = cfg.get_vif(); 
+    // monitor.vif = cfg.get_vif();
 
     // Connect sequencer to driver only if active
     if (axi_cfg.get_active_passive() == UVM_ACTIVE) begin
        driver.axi_cfg = axi_cfg; // Pass config to driver
        driver.seq_item_port.connect(sequencer.seq_item_export);
-       
+
        // Pass virtual interface to driver via config DB or direct handle assignment
        // Direct assignment is preferred if driver has 'vif' handle:
-       // driver.vif = cfg.get_vif(); 
-       
+       // driver.vif = cfg.get_vif();
+
        // OR if you use sub-component config_db setting (Legacy way):
       uvm_config_db#(virtual axi_if)::set(this, "driver", "vif", axi_cfg.get_axi_vif());
     end
-    
+
     // Also set for monitor if using config_db method
     uvm_config_db#(virtual axi_if)::set(this, "monitor", "vif", axi_cfg.get_axi_vif());
 
@@ -78,5 +78,4 @@ class axi_agent extends uvm_agent;
 endclass : axi_agent
 
 `endif // AXI_AGENT_SV
-
 

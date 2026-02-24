@@ -2,7 +2,7 @@
 `ifndef AXI_TYPES_SV
 `define AXI_TYPES_SV
 
-	
+
 package axi_types_pkg;
 
 	//virtual interface type
@@ -79,5 +79,4 @@ package axi_types_pkg;
 endpackage
 
 `endif // AXI_TYPES_SV
-
 

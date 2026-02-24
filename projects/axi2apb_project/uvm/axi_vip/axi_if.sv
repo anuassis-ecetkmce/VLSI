@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 
 interface axi_if #(
   parameter ADDR_W = 32,
@@ -21,7 +21,7 @@ interface axi_if #(
   logic              AWVALID;
   logic              AWREADY;
 
- 
+
   // AXI4 Write Data Channel
 
 
@@ -33,7 +33,7 @@ interface axi_if #(
 
 
   // AXI4 Write Response Channel
- 
+
 
   logic [ID_W-1:0] BID;
   logic [1:0]      BRESP;
@@ -42,7 +42,7 @@ interface axi_if #(
 
 
   // AXI4 Read Address Channel
- 
+
 
   logic [ID_W-1:0]   ARID;
   logic [ADDR_W-1:0] ARADDR;
@@ -52,9 +52,9 @@ interface axi_if #(
   logic              ARVALID;
   logic              ARREADY;
 
-  
+
   // AXI4 Read Data Channel
-  
+
 
   logic [ID_W-1:0]   RID;
   logic [DATA_W-1:0] RDATA;
@@ -63,9 +63,9 @@ interface axi_if #(
   logic              RVALID;
   logic              RREADY;
 
- 
+
   // Clocking block (for race-free driving & sampling)
-  
+
   clocking cb @(posedge ACLK);
     input  ARESETn;
 
@@ -83,9 +83,9 @@ interface axi_if #(
     output RREADY;
   endclocking
 
-  
+
   // Master modport
-  
+
 
   modport master (
     input  ACLK, ARESETn,
@@ -100,9 +100,9 @@ interface axi_if #(
     output RREADY
   );
 
-  
+
   // Reset task (clock-safe)
- 
+
 
   task automatic reset_signals();
     @(posedge ACLK);

@@ -4,3 +4,4 @@ waves.shm
 *.key
 *.history
 .simvision
+*.vcd

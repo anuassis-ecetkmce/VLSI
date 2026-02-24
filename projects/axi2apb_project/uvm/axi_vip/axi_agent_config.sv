@@ -7,7 +7,7 @@ class axi_agent_config extends uvm_component;
   `uvm_component_utils(axi_agent_config)
 
   // -- Configuration Fields --
-  
+
   // Virtual interface handle (Made local to enforce use of setter/getter)
   local cfs_axi_vif axi_vif;
 
@@ -30,7 +30,7 @@ class axi_agent_config extends uvm_component;
   // Constructor
   function new(string name = "",uvm_component parent );
     super.new(name, parent);
-    
+
   endfunction
 
   // -- Accessor Methods (Matches APB Style) --
@@ -55,10 +55,10 @@ class axi_agent_config extends uvm_component;
   virtual function uvm_active_passive_enum get_active_passive();
     return is_active;
   endfunction
-  
+
   virtual function void start_of_simulation_phase(uvm_phase phase);
         super.start_of_simulation_phase(phase);
-        
+
     if(get_axi_vif() == null) begin
       `uvm_fatal("ALGORITHM_ISSUE", "the AXI virtual interface is not configured at \"start of simulation\" phase")
         end
@@ -66,10 +66,9 @@ class axi_agent_config extends uvm_component;
           `uvm_info("AXI_CONFIG", "The AXI virtual interface is configured at \"start of simulation\" phase", UVM_LOW)
         end
     endfunction
-  
-  
+
+
 
 endclass : axi_agent_config
 
 `endif // AXI_AGENT_CONFIG_SV
-

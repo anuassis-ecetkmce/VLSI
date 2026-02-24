@@ -60,4 +60,3 @@ class axi_item_base extends uvm_sequence_item;
 endclass : axi_item_base
 
 `endif // AXI_ITEM_BASE_SV
-

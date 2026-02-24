@@ -10,7 +10,7 @@ import axi_types_pkg::*;
  * - Extended by driver-side sequences (axi_sequence_drv)
  * - Can be extended by other sequences if needed
  */
-class axi_sequence_base extends uvm_sequence #(axi_transaction);
+class axi_sequence_base extends uvm_sequence #(.REQ(axi_transaction));
 
   `uvm_object_utils(axi_sequence_base)
 

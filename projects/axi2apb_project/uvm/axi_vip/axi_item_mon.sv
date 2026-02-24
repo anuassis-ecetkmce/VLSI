@@ -7,7 +7,7 @@ import axi_types_pkg::*;
 
 // Monitor-side AXI item class
 class axi_item_mon extends axi_transaction;
-  
+
   // Time when this transaction was observed
   time signed   timestamp;
 
@@ -37,7 +37,7 @@ class axi_item_mon extends axi_transaction;
     string s;
     s = $sformatf(
       "AXI_MON: id=%0d, addr=0x%0h, write=%0d, data0=0x%0h, resp=0x%0h, accepted=%0d @time=%0t",
-      id, addr, is_write, 
+      id, addr, is_write,
       (data_ary.size() > 0 ? data_ary[0] : '0),
       resp, accepted, timestamp
     );
@@ -45,7 +45,7 @@ class axi_item_mon extends axi_transaction;
   endfunction
 
   // Register fields for automation (optional dynamic array not printed)
-  
+
 
 endclass : axi_item_mon
 

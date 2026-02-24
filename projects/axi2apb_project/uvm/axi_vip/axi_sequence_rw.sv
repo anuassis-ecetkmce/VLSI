@@ -10,7 +10,7 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
   rand bit [31:0] base_addr;
   rand int unsigned num_trans;     // how many RW pairs
   rand bit [31:0] addr_stride;      // stride between addresses
-  
+
   constraint num_trans_default {
     num_trans inside{[1:10]};
   }
@@ -31,7 +31,7 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
 
       // ---- AXI WRITE ----
       axi_transaction tr = axi_transaction::type_id::create("axi_write");
-      
+
 
       // Write config
       tr.is_write = 1;

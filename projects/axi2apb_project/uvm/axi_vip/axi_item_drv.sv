@@ -43,7 +43,7 @@ class axi_item_drv extends axi_transaction;
   // - base fields are already included from axi_item_base
   // - add data_ary as dynamic array
   // -------------------------------------------------
-  
+
 
 endclass : axi_item_drv
 

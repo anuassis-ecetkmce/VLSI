@@ -3,7 +3,7 @@
 
 `include "uvm_macros.svh"
 //Include APB interface
-`include "cfs_apb_if.sv"
+//`include "cfs_apb_if.sv"
 
 package cfs_apb_pkg;
 
