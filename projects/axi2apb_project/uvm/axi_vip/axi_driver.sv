@@ -6,7 +6,7 @@ import uvm_pkg::*;
 
 class axi_driver extends uvm_driver #(axi_transaction);
 
-    axi_agent_config axi_cfg;
+  axi_agent_config axi_cfg;
 
   `uvm_component_utils(axi_driver)
 
@@ -26,7 +26,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     end
   endfunction
 
-  // Reset task
+  // Reset phase
   task reset_phase(uvm_phase phase);
     phase.raise_objection(this);
     axi_vif.reset_signals();
@@ -66,35 +66,51 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.AWBURST <= tr.burst;
     axi_vif.cb.AWVALID <= 1'b1;
 
-    // Wait for handshake
+    // Wait for AW handshake
     do @(axi_vif.cb); while (!axi_vif.cb.AWREADY);
+
     axi_vif.cb.AWVALID <= 1'b0;
-    
+
     // --------------------
     // WRITE DATA (W)
     // --------------------
-       for (int i = 0; i < beats; i++) begin
-    
+    for (int i = 0; i < beats; i++) begin
+
+      // Align to clock
+      @(axi_vif.cb);
+
+      // Drive data BEFORE asserting valid
       axi_vif.cb.WDATA  <= tr.data_ary[i];
       axi_vif.cb.WSTRB  <= '1;
       axi_vif.cb.WLAST  <= (i == beats - 1);
       axi_vif.cb.WVALID <= 1'b1;
-    
+
+      // Wait for W handshake
       do @(axi_vif.cb); while (!axi_vif.cb.WREADY);
-    
-      @(axi_vif.cb);
+
+      // Deassert after handshake
       axi_vif.cb.WVALID <= 1'b0;
-    
+
     end
+
+    // Cleanup
+    @(axi_vif.cb);
+    axi_vif.cb.WLAST <= 1'b0;
 
     // --------------------
     // WRITE RESPONSE (B)
     // --------------------
+    @(axi_vif.cb);
     axi_vif.cb.BREADY <= 1'b1;
+
     do @(axi_vif.cb); while (!axi_vif.cb.BVALID);
+
     tr.resp = axi_vif.cb.BRESP;
+
     axi_vif.cb.BREADY <= 1'b0;
+
   endtask
+
 
   // ============================================
   // READ TRANSACTION
@@ -115,25 +131,27 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.ARVALID <= 1'b1;
 
     do @(axi_vif.cb); while (!axi_vif.cb.ARREADY);
+
     axi_vif.cb.ARVALID <= 1'b0;
 
     // --------------------
     // READ DATA (R)
     // --------------------
+    @(axi_vif.cb);
     axi_vif.cb.RREADY <= 1'b1;
 
     for (int i = 0; i < beats; i++) begin
       do @(axi_vif.cb); while (!axi_vif.cb.RVALID);
       tr.data_ary[i] = axi_vif.cb.RDATA;
+
       if (axi_vif.cb.RLAST)
         break;
     end
 
-    tr.resp = axi_vif.cb.RRESP;
     axi_vif.cb.RREADY <= 1'b0;
+
   endtask
 
 endclass : axi_driver
 
 `endif
-
