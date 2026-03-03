@@ -69,23 +69,23 @@ class axi_driver extends uvm_driver #(axi_transaction);
     // Wait for handshake
     do @(axi_vif.cb); while (!axi_vif.cb.AWREADY);
     axi_vif.cb.AWVALID <= 1'b0;
-
+    
     // --------------------
     // WRITE DATA (W)
     // --------------------
-    axi_vif.cb.WVALID <= 1'b1;
-
-    for (int i = 0; i < beats; i++) begin
-      @(axi_vif.cb);
-      axi_vif.cb.WDATA <= tr.data_ary[i];
-      axi_vif.cb.WSTRB <= '1;
-      axi_vif.cb.WLAST <= (i == beats - 1);
-
+       for (int i = 0; i < beats; i++) begin
+    
+      axi_vif.cb.WDATA  <= tr.data_ary[i];
+      axi_vif.cb.WSTRB  <= '1;
+      axi_vif.cb.WLAST  <= (i == beats - 1);
+      axi_vif.cb.WVALID <= 1'b1;
+    
       do @(axi_vif.cb); while (!axi_vif.cb.WREADY);
+    
+      @(axi_vif.cb);
+      axi_vif.cb.WVALID <= 1'b0;
+    
     end
-
-    axi_vif.cb.WVALID <= 1'b0;
-    axi_vif.cb.WLAST  <= 1'b0;
 
     // --------------------
     // WRITE RESPONSE (B)
