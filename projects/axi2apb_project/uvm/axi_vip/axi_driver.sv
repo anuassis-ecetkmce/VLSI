@@ -143,7 +143,6 @@ class axi_driver extends uvm_driver #(axi_transaction);
     // --------------------
     axi_vif.cb.RREADY <= 1'b1;
 
-Ayisha, [24-02-2026 9:49]
 for (int i = 0; i < beats; i++) begin
       // Wait for RVALID
       do @(axi_vif.cb); while (!axi_vif.cb.RVALID);
