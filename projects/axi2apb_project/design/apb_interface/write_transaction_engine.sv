@@ -25,18 +25,17 @@ module address_decoder #(
     output logic [NUM_SLAVES-1:0]   slave_sel,
     output logic                    decode_error
 );
-
-    always_comb begin
-        slave_sel    = '0;
+    // Icarus-safe: no automatic, no int — use module-scope integer + always @(*)
+    integer dec_i;
+    always @(*) begin
+        slave_sel    = {NUM_SLAVES{1'b0}};
         decode_error = 1'b1;
-
-        for (int i = 0; i < NUM_SLAVES; i++) begin
-            automatic logic [ADDR_WIDTH-1:0] base = SLAVE_BASE_ADDR[i*ADDR_WIDTH +: ADDR_WIDTH];
-            automatic logic [ADDR_WIDTH-1:0] sz   = SLAVE_SIZE     [i*ADDR_WIDTH +: ADDR_WIDTH];
-
-            if ((addr_in >= base) && (addr_in < (base + sz))) begin
-                slave_sel[i] = 1'b1;
-                decode_error = 1'b0;
+        for (dec_i = 0; dec_i < NUM_SLAVES; dec_i = dec_i + 1) begin
+            if ((addr_in >= SLAVE_BASE_ADDR[dec_i*ADDR_WIDTH +: ADDR_WIDTH]) &&
+                (addr_in <  SLAVE_BASE_ADDR[dec_i*ADDR_WIDTH +: ADDR_WIDTH]
+                          + SLAVE_SIZE    [dec_i*ADDR_WIDTH +: ADDR_WIDTH])) begin
+                slave_sel[dec_i] = 1'b1;
+                decode_error     = 1'b0;
             end
         end
     end
@@ -72,14 +71,11 @@ module apb_output_regs #(
     output logic                        pwrite
 );
 
-    // PSEL
+    // PSEL -- load_en beats clear_en (back-to-back transaction fix)
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            psel <= '0;
-        else if (clear_en)
-            psel <= '0;
-        else if (load_en)
-            psel <= slave_sel_in;
+        if (!rst_n)        psel <= '0;
+        else if (load_en)  psel <= slave_sel_in;
+        else if (clear_en) psel <= '0;
     end
 
     // PENABLE
@@ -116,14 +112,11 @@ module apb_output_regs #(
             pstrb <= strb_in;
     end
 
-    // PWRITE
+    // PWRITE -- load_en beats clear_en
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            pwrite <= 1'b0;
-        else if (clear_en)
-            pwrite <= 1'b0;
-        else if (load_en)
-            pwrite <= 1'b1;
+        if (!rst_n)                    pwrite <= 1'b0;
+        else if (clear_en && !load_en) pwrite <= 1'b0;
+        else if (load_en)              pwrite <= 1'b1;
     end
 
 endmodule
@@ -148,29 +141,33 @@ module write_response_ctrl #(
     output logic [1:0]          txn_resp
 );
 
-    logic [1:0] txn_resp_reg;
+    // FIX: latch id and resp on resp_valid. txn_complete fires one cycle
+    // later (registered resp_valid). Latched values are stable by then,
+    // even if the engine starts the next transaction and overwrites
+    // txn_id_reg on the same edge.
+    logic [ID_WIDTH-1:0] id_lat;
+    logic [1:0]          resp_lat;
 
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            txn_resp_reg <= 2'b00;
-        else if (resp_valid) begin
+        if (!rst_n) begin
+            id_lat   <= '0;
+            resp_lat <= 2'b00;
+        end else if (resp_valid) begin
+            id_lat <= resp_id;
             if (resp_is_decerr)
-                txn_resp_reg <= 2'b11;
+                resp_lat <= 2'b11;
             else
-                txn_resp_reg <= resp_pslverr ? 2'b10 : 2'b00;
+                resp_lat <= resp_pslverr ? 2'b10 : 2'b00;
         end
     end
 
-    assign txn_resp = txn_resp_reg;
-
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            txn_complete <= 1'b0;
-        else
-            txn_complete <= resp_valid;
+        if (!rst_n) txn_complete <= 1'b0;
+        else        txn_complete <= resp_valid;
     end
 
-    assign txn_id = resp_id;
+    assign txn_id   = id_lat;
+    assign txn_resp = resp_lat;
 
 endmodule
 
@@ -204,15 +201,19 @@ module write_transaction_engine #(
     output logic                    cmd_ready,
     input  logic [ADDR_WIDTH-1:0]   cmd_addr,
     input  logic [ID_WIDTH-1:0]     cmd_id,
+    input  logic [7:0]              cmd_len,
 
     input  logic                    wdata_valid,
     output logic                    wdata_ready,
     input  logic [DATA_WIDTH-1:0]   wdata_in,
     input  logic [DATA_WIDTH/8-1:0] wstrb_in,
+    input  logic                    wdata_last,
 
     output logic                    txn_complete,
     output logic [ID_WIDTH-1:0]     txn_id,
     output logic [1:0]              txn_resp,
+
+    input  logic                    resp_fifo_full,
 
     output logic [NUM_SLAVES-1:0]   psel,
     output logic                    penable,
@@ -227,12 +228,19 @@ module write_transaction_engine #(
     localparam STRB_W = DATA_WIDTH / 8;
 
     // FSM
-    typedef enum logic [2:0] {
-        IDLE   = 3'b000,
-        SETUP  = 3'b001,
-        ACCESS = 3'b010,
-        WAIT   = 3'b011,
-        ERROR  = 3'b100
+    // FIX-A: DECODE state — txn_addr is written on IDLE->SETUP clock edge;
+    //        decoder result is stale in SETUP. DECODE gives it one cycle to settle.
+    // FIX-B: RESP_STALL — waits for response FIFO room without clearing APB outputs.
+    // FIX-C: ENABLE state for APB SETUP phase (PSEL=1, PENABLE=0 for one full cycle).
+    typedef enum logic [3:0] {
+        IDLE       = 4'b0000,
+        SETUP      = 4'b0001,   // capture regs written; do NOT read decoder yet
+        DECODE     = 4'b0010,   // FIX-A: decoder settles on new txn_addr
+        ENABLE     = 4'b0011,   // FIX-C: APB SETUP phase — PSEL=1, PENABLE=0
+        ACCESS     = 4'b0100,   // APB ACCESS phase — PSEL=1, PENABLE=1
+        WAIT       = 4'b0101,   // waiting for PREADY
+        RESP_STALL = 4'b0110,   // FIX-B: waiting for response FIFO room
+        ERROR      = 4'b0111    // decode error
     } apb_state_t;
 
     apb_state_t apb_state, apb_state_next;
@@ -297,47 +305,66 @@ module write_transaction_engine #(
     end
 
     // FSM next-state
-    always_comb begin
-        apb_state_next = apb_state;
-
+    always @(*) begin
+        apb_state_next = apb_state;  // default: hold state
         case (apb_state)
-            IDLE: begin
-                if (txn_start)
-                    apb_state_next = SETUP;
-            end
+            IDLE:
+                if (txn_start) apb_state_next = SETUP;
 
-            SETUP: begin
+            // FIX-A: capture regs written this edge; decoder still sees old
+            // txn_addr. Go to DECODE so it has one cycle to settle.
+            SETUP:
+                apb_state_next = DECODE;
+
+            // FIX-A: decoder settled on new txn_addr now
+            DECODE: begin
                 if (decode_error)
                     apb_state_next = ERROR;
                 else
-                    apb_state_next = ACCESS;
+                    apb_state_next = ENABLE;
             end
 
+            // FIX-C: APB SETUP phase (PSEL loaded here, PENABLE=0)
+            ENABLE:
+                apb_state_next = ACCESS;
+
             ACCESS: begin
-                if (pready)
-                    apb_state_next = IDLE;
+                if (pready) begin
+                    if (resp_fifo_full)
+                        apb_state_next = RESP_STALL;
+                    else
+                        apb_state_next = IDLE;
+                end
                 else
                     apb_state_next = WAIT;
             end
 
             WAIT: begin
-                if (pready)
-                    apb_state_next = IDLE;
+                if (pready) begin
+                    if (resp_fifo_full)
+                        apb_state_next = RESP_STALL;
+                    else
+                        apb_state_next = IDLE;
+                end
             end
 
-            ERROR: begin
-                apb_state_next = IDLE;
-            end
+            // FIX-B: hold until FIFO has room; APB outputs NOT cleared here
+            RESP_STALL:
+                if (!resp_fifo_full) apb_state_next = IDLE;
 
-            default: begin
+            ERROR:
+                if (!resp_fifo_full) apb_state_next = IDLE;
+
+            default:
                 apb_state_next = IDLE;
-            end
         endcase
     end
 
-    // Control signals to sub-modules
-    assign oreg_load_en    = (apb_state == SETUP) && !decode_error;
-    assign oreg_clear_en   = (apb_state == IDLE) || (apb_state == ERROR);
+    // Control signals
+    // FIX-C: load_en fires in ENABLE (decoder valid from DECODE onwards)
+    // FIX-B: clear_en fires in IDLE ONLY -- not RESP_STALL
+    assign oreg_load_en    = (apb_state == ENABLE);
+    assign oreg_clear_en   = (apb_state == IDLE);
     assign oreg_enable_set = (apb_state == ACCESS) || (apb_state == WAIT);
 
     // APB Output Regs
@@ -363,10 +390,11 @@ module write_transaction_engine #(
         .pwrite         (pwrite)
     );
 
-    // Response control signals
-    assign resp_valid      = ((apb_state == SETUP) && decode_error)
-                           || (((apb_state == ACCESS) || (apb_state == WAIT)) && pready);
-    assign resp_is_decerr  = (apb_state == SETUP) && decode_error;
+    assign resp_valid =
+        (((apb_state == ACCESS) || (apb_state == WAIT)) && pready && !resp_fifo_full)
+      || ((apb_state == RESP_STALL) && !resp_fifo_full)
+      || ((apb_state == ERROR)      && !resp_fifo_full);
+    assign resp_is_decerr = (apb_state == ERROR);
 
     // Write Response Controller
     write_response_ctrl #(
