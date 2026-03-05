@@ -6,7 +6,6 @@
 import uvm_pkg::*;
 
 class axi_driver extends uvm_driver #(axi_transaction);
-  
   axi_agent_config axi_cfg;
 
   `uvm_component_utils(axi_driver)
@@ -27,7 +26,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     end
   endfunction
 
-  // Reset task
+  // Reset phase
   task reset_phase(uvm_phase phase);
     phase.raise_objection(this);
     axi_vif.reset_signals();
@@ -71,49 +70,52 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.AWBURST <= tr.burst;
     axi_vif.cb.AWVALID <= 1'b1;
 
-    // Wait for AWREADY handshake
+    // Wait for AW handshake
     do @(axi_vif.cb); while (!axi_vif.cb.AWREADY);
+
     axi_vif.cb.AWVALID <= 1'b0;
 
     // --------------------
     // 3. ADDR TO DATA GAP (Gap between AW and W)
     // --------------------
-    repeat(tr.addr_to_data_gap) @(axi_vif.cb);
-
-    // --------------------
-    // 4. WRITE DATA (W)
-    // --------------------
     for (int i = 0; i < beats; i++) begin
+
+      // Align to clock
+      @(axi_vif.cb);
+
+      // Drive data BEFORE asserting valid
       axi_vif.cb.WDATA  <= tr.data_ary[i];
-      axi_vif.cb.WSTRB  <= '1; // Simplified: assumes full-width write
+      axi_vif.cb.WSTRB  <= '1;
       axi_vif.cb.WLAST  <= (i == beats - 1);
       axi_vif.cb.WVALID <= 1'b1;
 
-      // Wait for WREADY
+      // Wait for W handshake
       do @(axi_vif.cb); while (!axi_vif.cb.WREADY);
-      
-      axi_vif.cb.WVALID <= 1'b0;
-      axi_vif.cb.WLAST  <= 1'b0;
 
-      // Inter-beat delay (Gap between data beats)
-      repeat(tr.inter_beat_delay) @(axi_vif.cb);
+      // Deassert after handshake
+      axi_vif.cb.WVALID <= 1'b0;
+
     end
+
+    // Cleanup
+    @(axi_vif.cb);
+    axi_vif.cb.WLAST <= 1'b0;
 
     // --------------------
     // 5. WRITE RESPONSE (B)
     // --------------------
-    // Randomized delay before asserting BREADY
-    repeat(tr.wait_for_bresp_delay) @(axi_vif.cb);
-    
+    @(axi_vif.cb);
     axi_vif.cb.BREADY <= 1'b1;
-    // Wait for BVALID from slave
+
     do @(axi_vif.cb); while (!axi_vif.cb.BVALID);
-    
+
     tr.resp = axi_vif.cb.BRESP;
+
     axi_vif.cb.BREADY <= 1'b0;
     
     `uvm_info("DRV_WRITE", $sformatf("Write Finished: Addr=0x%0h, Resp=0x%0h", tr.addr, tr.resp), UVM_HIGH)
   endtask
+
 
   // ============================================
   // READ TRANSACTION
@@ -136,11 +138,13 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.ARVALID <= 1'b1;
 
     do @(axi_vif.cb); while (!axi_vif.cb.ARREADY);
+
     axi_vif.cb.ARVALID <= 1'b0;
 
     // --------------------
     // 3. READ DATA (R)
     // --------------------
+    @(axi_vif.cb);
     axi_vif.cb.RREADY <= 1'b1;
 
 for (int i = 0; i < beats; i++) begin
@@ -148,19 +152,13 @@ for (int i = 0; i < beats; i++) begin
       do @(axi_vif.cb); while (!axi_vif.cb.RVALID);
       
       tr.data_ary[i] = axi_vif.cb.RDATA;
-      
-      // If we see RLAST, we should exit even if the loop isn't done (Protocol Safety)
-      if (axi_vif.cb.RLAST) begin
-         if (i != beats - 1) `uvm_warning("DRV_READ", "RLAST received earlier than expected")
-         break;
-      end
-      
-      // Optional: If you wanted to test RREADY throttling, you'd add delays here
-      @(axi_vif.cb); 
+
+      if (axi_vif.cb.RLAST)
+        break;
     end
 
-    tr.resp = axi_vif.cb.RRESP;
     axi_vif.cb.RREADY <= 1'b0;
+
   endtask
 
 endclass : axi_driver

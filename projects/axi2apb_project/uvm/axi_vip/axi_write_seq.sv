@@ -12,6 +12,7 @@ class axi_write_stress_seq extends axi_sequence_base;
       tr = axi_transaction::type_id::create("tr");
       start_item(tr);
       if(!tr.randomize() with {
+        addr inside {[32'h10000000 : 32'h4FFFFFFF]};
         is_write             == 1;
         pre_addr_delay       == 0; 
         addr_to_data_gap     == 0; 

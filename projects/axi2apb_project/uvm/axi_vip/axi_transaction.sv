@@ -24,20 +24,32 @@ class axi_transaction extends uvm_sequence_item;
   // Response sampled from bus
   bit [1:0]        resp;
 
+  // Field automation
+  `uvm_object_utils_begin(axi_transaction)
+    `uvm_field_int(id,       UVM_ALL_ON)
+    `uvm_field_int(addr,     UVM_ALL_ON)
+    `uvm_field_int(len,      UVM_ALL_ON)
+    `uvm_field_int(size,     UVM_ALL_ON)
+    `uvm_field_int(burst,    UVM_ALL_ON)
+    `uvm_field_int(is_write, UVM_ALL_ON)
+    `uvm_field_int(resp,     UVM_ALL_ON)
+    `uvm_field_array_int(data_ary, UVM_ALL_ON)
+  `uvm_object_utils_end
+
   // -------------------------------------------------
   // NEW: Timing & Delay Knobs for specialized testing
   // -------------------------------------------------
+
   // Delay before asserting AWVALID/ARVALID
-  rand int unsigned pre_addr_delay;  
-  
+  rand int unsigned pre_addr_delay;
   // Delay between Address Handshake and first Data beat (WVALID)
-  rand int unsigned addr_to_data_gap; 
-  
+  rand int unsigned addr_to_data_gap;
   // Delay between individual data beats within a burst
-  rand int unsigned inter_beat_delay; 
-  
+  rand int unsigned inter_beat_delay;
   // Delay before asserting BREADY to accept response
   rand int unsigned wait_for_bresp_delay;
+
+  // Constraints (CRITICAL)
 
   // -------------------------------------------------
   // Constraints
@@ -114,6 +126,12 @@ class axi_transaction extends uvm_sequence_item;
     inter_beat_delay     = rhs_t.inter_beat_delay;
     wait_for_bresp_delay = rhs_t.wait_for_bresp_delay;
 
+    // Copy new timing fields
+    pre_addr_delay       = rhs_t.pre_addr_delay;
+    addr_to_data_gap     = rhs_t.addr_to_data_gap;
+    inter_beat_delay     = rhs_t.inter_beat_delay;
+    wait_for_bresp_delay = rhs_t.wait_for_bresp_delay;
+
     data_ary = new[rhs_t.data_ary.size()];
     foreach (data_ary[i])
       data_ary[i] = rhs_t.data_ary[i];
@@ -125,7 +143,7 @@ class axi_transaction extends uvm_sequence_item;
     if (!$cast(rhs_t, rhs)) return 0;
 
 
-return (super.do_compare(rhs, comparer) &&
+    return (super.do_compare(rhs, comparer) &&
             (id                   == rhs_t.id) &&
             (addr                 == rhs_t.addr) &&
             (len                  == rhs_t.len) &&

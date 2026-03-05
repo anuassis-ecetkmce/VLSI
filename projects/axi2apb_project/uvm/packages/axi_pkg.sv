@@ -25,6 +25,7 @@ package axi_pkg;
 
 	`include "axi_sequence_base.sv"
 	`include "axi_sequence_rw.sv"
+	`include "axi_write_seq.sv"
 
 	// Add more includes as needed for all APB files
 

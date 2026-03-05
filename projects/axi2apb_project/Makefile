@@ -9,10 +9,14 @@ TESTS_DIR     = $(UVM_DIR)/tests
 
 #DESIGN (RTL first)
 DESIGN_SRCS = \
-$(DESIGN_DIR)/axi_apb_write_path_top.sv \
-$(DESIGN_DIR)/axi_input_stage.sv \
-$(DESIGN_DIR)/write_transaction_complete.sv \
-# Add other design files here
+$(DESIGN_DIR)/common/axi_hold_reg.sv \
+$(DESIGN_DIR)/common/sync_fifo.sv \
+$(DESIGN_DIR)/axi_interface/axi_input_stage.sv \
+$(DESIGN_DIR)/apb_interface/write_transaction_engine.sv \
+$(DESIGN_DIR)/response/axi_response_stage.sv \
+$(DESIGN_DIR)/top/axi_apb_write_bridge_top.sv \
+
+#Add other design files here
 
 #INTERFACES
 IF_SRCS = \
@@ -40,6 +44,9 @@ ALL_SRCS = \
 # ---- Testbench top module name (EDIT THIS) ----
 # Change tb_top to your actual top module, e.g. seq_tb or axi2apb_tb
 TB_TOP = axi_apb_bridge_tb_top
+
+#UVM test name
+UVM_TEST ?= cfs_bridge_test_reg_access
 
 # Work library
 WORKLIB = worklib
@@ -87,13 +94,15 @@ compile:
 run: compile
 	$(XRUN) -R \
 	-work $(WORKLIB) \
-	$(XRUN_COMMON)
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
 
 # GUI Mode
 gui: compile
 	$(XRUN) -R -gui \
 	-work $(WORKLIB) \
-	$(XRUN_COMMON)
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
 
 # Show what files the Makefile will compile (good for debugging)
 show_files:
