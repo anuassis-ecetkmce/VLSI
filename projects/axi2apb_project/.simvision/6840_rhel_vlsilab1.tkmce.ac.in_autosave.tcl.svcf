@@ -1,0 +1,146 @@
+
+#
+# Preferences
+#
+preferences set plugin-enable-svdatabrowser-new 1
+preferences set plugin-enable-groupscope 0
+preferences set plugin-enable-interleaveandcompare 0
+preferences set plugin-enable-waveformfrequencyplot 0
+preferences set savedlg-simulator ppe
+
+#
+# Mnemonic Maps
+#
+mmap new  -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new  -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+
+#
+# Design Browser windows
+#
+if {[catch {window new WatchList -name "Design Browser 1" -geometry 1920x980+-1+26}] != ""} {
+    window geometry "Design Browser 1" 1920x980+-1+26
+}
+window target "Design Browser 1" on
+browser using {Design Browser 1}
+browser set -scope  simulator::axi_apb_bridge_tb_top.DUT 
+browser set \
+    -showinternals 0 \
+    -signalsort name
+browser yview see  simulator::axi_apb_bridge_tb_top.DUT 
+browser timecontrol set -lock 0
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1920x980+-1+26}] != ""} {
+    window geometry "Waveform 1" 1920x980+-1+26
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar visibility partial
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ps \
+    -valuewidth 75
+waveform baseline set -time 0
+
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.bid[3:0]}
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.awaddr[31:0]}
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.awburst[1:0]}
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.awid[3:0]}
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.awlen[7:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.awready
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.awsize[2:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.awvalid
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.bready
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.bresp[1:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.bvalid
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.clk
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.paddr[31:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.penable
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.pready
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.psel[3:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.pslverr
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.pstrb[3:0]}
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.pwdata[31:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.pwrite
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.rst_n
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.wdata[31:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.wlast
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.wready
+	} ]
+set id [waveform add -signals  {
+	{simulator::axi_apb_bridge_tb_top.DUT.wstrb[3:0]}
+	} ]
+set id [waveform add -signals  {
+	simulator::axi_apb_bridge_tb_top.DUT.wvalid
+	} ]
+
+waveform xview limits 0 1168287.66ps
+
+#
+# Waveform Window Links
+#
+
+#
+# Console windows
+#
+console set -windowname Console
+window geometry Console 730x250+261+564
+
+#
+# Layout selection
+#
