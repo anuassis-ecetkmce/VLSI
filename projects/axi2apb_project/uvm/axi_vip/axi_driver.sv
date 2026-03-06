@@ -1,4 +1,3 @@
-
 `ifndef AXI_DRIVER_SV
 `define AXI_DRIVER_SV
 
@@ -6,6 +5,7 @@
 import uvm_pkg::*;
 
 class axi_driver extends uvm_driver #(axi_transaction);
+
   axi_agent_config axi_cfg;
 
   `uvm_component_utils(axi_driver)
@@ -56,13 +56,9 @@ class axi_driver extends uvm_driver #(axi_transaction);
     int beats = tr.len + 1;
 
     // --------------------
-    // 1. PRE-ADDRESS DELAY
+    // WRITE ADDRESS (AW)
     // --------------------
-    repeat(tr.pre_addr_delay) @(axi_vif.cb);
-
-    // --------------------
-    // 2. WRITE ADDRESS (AW)
-    // --------------------
+    @(axi_vif.cb);
     axi_vif.cb.AWID    <= tr.id;
     axi_vif.cb.AWADDR  <= tr.addr;
     axi_vif.cb.AWLEN   <= tr.len;
@@ -76,7 +72,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.AWVALID <= 1'b0;
 
     // --------------------
-    // 3. ADDR TO DATA GAP (Gap between AW and W)
+    // WRITE DATA (W)
     // --------------------
     for (int i = 0; i < beats; i++) begin
 
@@ -102,7 +98,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.WLAST <= 1'b0;
 
     // --------------------
-    // 5. WRITE RESPONSE (B)
+    // WRITE RESPONSE (B)
     // --------------------
     @(axi_vif.cb);
     axi_vif.cb.BREADY <= 1'b1;
@@ -112,8 +108,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     tr.resp = axi_vif.cb.BRESP;
 
     axi_vif.cb.BREADY <= 1'b0;
-    
-    `uvm_info("DRV_WRITE", $sformatf("Write Finished: Addr=0x%0h, Resp=0x%0h", tr.addr, tr.resp), UVM_HIGH)
+
   endtask
 
 
@@ -124,12 +119,10 @@ class axi_driver extends uvm_driver #(axi_transaction);
     int beats = tr.len + 1;
     tr.alloc_data_array();
 
-    // 1. PRE-ADDRESS DELAY (Reusing field for symmetry)
-    repeat(tr.pre_addr_delay) @(axi_vif.cb);
-
     // --------------------
-    // 2. READ ADDRESS (AR)
+    // READ ADDRESS (AR)
     // --------------------
+    @(axi_vif.cb);
     axi_vif.cb.ARID    <= tr.id;
     axi_vif.cb.ARADDR  <= tr.addr;
     axi_vif.cb.ARLEN   <= tr.len;
@@ -142,15 +135,13 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.ARVALID <= 1'b0;
 
     // --------------------
-    // 3. READ DATA (R)
+    // READ DATA (R)
     // --------------------
     @(axi_vif.cb);
     axi_vif.cb.RREADY <= 1'b1;
 
-for (int i = 0; i < beats; i++) begin
-      // Wait for RVALID
+    for (int i = 0; i < beats; i++) begin
       do @(axi_vif.cb); while (!axi_vif.cb.RVALID);
-      
       tr.data_ary[i] = axi_vif.cb.RDATA;
 
       if (axi_vif.cb.RLAST)

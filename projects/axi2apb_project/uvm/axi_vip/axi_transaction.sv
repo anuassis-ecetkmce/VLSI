@@ -6,7 +6,6 @@
 import uvm_pkg::*;
 
 class axi_transaction extends uvm_sequence_item;
-  `uvm_object_utils(axi_transaction)
 
   // -------------------------------------------------
   // Standard AXI protocol fields
@@ -156,22 +155,6 @@ class axi_transaction extends uvm_sequence_item;
             (wait_for_bresp_delay == rhs_t.wait_for_bresp_delay) &&
             (data_ary             == rhs_t.data_ary));
   endfunction
-
-  // Field automation
-  `uvm_field_int(id,                   UVM_ALL_ON)
-  `uvm_field_int(addr,                 UVM_ALL_ON)
-  `uvm_field_int(len,                  UVM_ALL_ON)
-  `uvm_field_int(size,                 UVM_ALL_ON)
-  `uvm_field_int(burst,                UVM_ALL_ON)
-  `uvm_field_int(is_write,             UVM_ALL_ON)
-  `uvm_field_int(resp,                 UVM_ALL_ON)
-  `uvm_field_array_int(data_ary,       UVM_ALL_ON)
-  
-  // Automate new delay fields
-  `uvm_field_int(pre_addr_delay,       UVM_ALL_ON | UVM_DEC)
-  `uvm_field_int(addr_to_data_gap,     UVM_ALL_ON | UVM_DEC)
-  `uvm_field_int(inter_beat_delay,     UVM_ALL_ON | UVM_DEC)
-  `uvm_field_int(wait_for_bresp_delay, UVM_ALL_ON | UVM_DEC)
 
 endclass
 
