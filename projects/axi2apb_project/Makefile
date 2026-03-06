@@ -1,86 +1,77 @@
+DESIGN_DIR    = design
+TB_DIR        = testbench
+UVM_DIR       = uvm
+APB_VIP_DIR   = $(UVM_DIR)/apb_vip
+AXI_VIP_DIR   = $(UVM_DIR)/axi_vip
+PKG_DIR       = $(UVM_DIR)/packages
+ENV_DIR       = $(UVM_DIR)/env
+TESTS_DIR     = $(UVM_DIR)/tests
+
 #DESIGN (RTL first)
 DESIGN_SRCS = \
-design/rtl/axi_if.sv \
-design/rtl/apb_if.sv \
-design/rtl/axi2apb_fsm.sv \
-design/rtl/axi2apb_ctrl.sv \
-design/rtl/axi2apb_top.sv
+$(DESIGN_DIR)/common/axi_hold_reg.sv \
+$(DESIGN_DIR)/common/sync_fifo.sv \
+$(DESIGN_DIR)/axi_interface/axi_input_stage.sv \
+$(DESIGN_DIR)/apb_interface/write_transaction_engine.sv \
+$(DESIGN_DIR)/response/axi_response_stage.sv \
+$(DESIGN_DIR)/top/axi_apb_write_bridge_top.sv \
+
+#Add other design files here
 
 #INTERFACES
 IF_SRCS = \
-uvm/interfaces/axi_if.sv \
-uvm/interfaces/apb_if.sv
+    $(AXI_VIP_DIR)/axi_if.sv \
+    $(APB_VIP_DIR)/cfs_apb_if.sv \
 
 #UVM PACKAGES (ALWAYS BEFORE COMPONENTS)
-UVM_PKG_SRCS = \
-uvm/pkg/axi_pkg.sv \
-uvm/pkg/apb_pkg.sv \
-uvm/pkg/env_pkg.sv
-
-#UVM COMPONENTS
-UVM_COMP_SRCS = \
-uvm/agent/axi/axi_driver.sv \
-uvm/agent/axi/axi_monitor.sv \
-uvm/agent/axi/axi_sequencer.sv \
-uvm/agent/apb/apb_driver.sv \
-uvm/agent/apb/apb_monitor.sv \
-uvm/env/axi2apb_env.sv \
-uvm/env/axi2apb_scoreboard.sv
-
-# 5. UVM TESTS
-UVM_TEST_SRCS = \
-uvm/tests/base_test.sv \
-uvm/tests/sanity_test.sv
+# UVM Packages
+PKG_SRCS = \
+    $(PKG_DIR)/cfs_apb_pkg.sv \
+    $(PKG_DIR)/cfs_bridge_pkg.sv \
+    $(PKG_DIR)/cfs_bridge_test_pkg.sv \
 
 #TB TOP (LAST)
 TB_SRCS = \
-testbench/seq_tb.sv
+    $(TB_DIR)/axi_apb_bridge_tb_top.sv
 
 # FINAL ORDERED SOURCE LIST
 ALL_SRCS = \
-$(DESIGN_SRCS) \
-$(IF_SRCS) \
-$(UVM_PKG_SRCS) \
-$(UVM_COMP_SRCS) \
-$(UVM_TEST_SRCS) \
-$(TB_SRCS)
-
-# ---- Directories ----
-#DESIGN_DIR = design
-#TB_DIR = testbench
-#UVM_DIR = uvm
-
-# ---- Source file lists (auto-expand as you add files) ----
-#DESIGN_SRCS 	= $(wildcard $(DESIGN_DIR)/*.v $(DESIGN_DIR)/*.sv)
-#TB_SRCS	= $(wildcard $(TB_DIR)/*.v $(TB_DIR)/*.sv)
-#UVM_SRCS 	= $(wildcard $(UVM_DIR)/*.v $(UVM_DIR)/*.sv)
-
-# If you have uvm_pkg.sv / macros.svh etc, you can also add them explicitly:
-# UVM_SRCS += $(UVM_DIR)/uvm_pkg.sv
-
-#ALL_SRCS = \
-#$(DESIGN_SRCS) \
-#$(TB_SRCS) \
-#$(UVM_SRCS)
-
-
+    $(DESIGN_SRCS) \
+    $(IF_SRCS) \
+    $(PKG_SRCS) \
+    $(TB_SRCS)
 
 # ---- Testbench top module name (EDIT THIS) ----
 # Change tb_top to your actual top module, e.g. seq_tb or axi2apb_tb
-TB_TOP = seq_tb
+TB_TOP = axi_apb_bridge_tb_top
+
+#UVM test name
+UVM_TEST ?= cfs_bridge_test_reg_access
+
+# Work library
+WORKLIB = worklib
 
 # ---- Xcelium binary & options ----
 XRUN = xrun
-XRUN_COMMON = -64bit -access +rwc -licqueue
-XRUN_UVM = -uvm # xcelium UVM switch (adjust if your version differs)
+XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps
+XRUN_UVM = -uvm -uvmhome CDNS-1.2 # xcelium UVM switch (adjust if your version differs)
+
+# We tell xrun to look inside these folders when it sees an `include "file.sv"
+INCDIRS = \
+    +incdir+$(UVM_DIR) \
+    +incdir+$(APB_VIP_DIR) \
+    +incdir+$(PKG_DIR) \
+    +incdir+$(ENV_DIR) \
+    +incdir+$(TESTS_DIR) \
+    +incdir+$(TB_DIR) \
+    +incdir+$(DESIGN_DIR) \
+    +incdir+$(AXI_VIP_DIR) \
+
 
 # Extra arguments you might want:
 # -gui : start in GUI
 # -linedebug : better debug info
 # -timescale : set global timescale if needed
-
-# Work library
-WORKLIB = sim
 
 # ==========================================
 # Targets
@@ -90,25 +81,28 @@ WORKLIB = sim
 
 all: run
 
-# Just compile & elaborate, no run
+# Compile Only
 compile:
 	$(XRUN) $(XRUN_COMMON) $(XRUN_UVM) \
 	-work $(WORKLIB) \
 	-top $(TB_TOP) \
+	$(INCDIRS) \
 	$(ALL_SRCS) \
 	-elaborate
 
-# Compile + run in console mode
+# Run (Simulate the snapshot created by compile)
 run: compile
-	$(XRUN) $(XRUN_COMMON) $(XRUN_UVM) \
-	     -work $(WORKLIB) \
-	     -R
-
-# Compile + run with GUI
-gui: compile
-	$(XRUN) $(XRUN_COMMON) $(XRUN_UVM) \
+	$(XRUN) -R \
 	-work $(WORKLIB) \
-	-R -gui
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
+
+# GUI Mode
+gui: compile
+	$(XRUN) -R -gui \
+	-work $(WORKLIB) \
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
 
 # Show what files the Makefile will compile (good for debugging)
 show_files:
@@ -120,4 +114,11 @@ show_files:
 
 # Remove simulation outputs
 clean:
-	rm -rf $(WORKLIB) xrun.history xrun.log waves.shm *.shm *.key *.err
+	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err
+
+
+#commands to run the makefile
+# make clean - to clean the previous run output and log files
+# make complie - to compile the code the files
+# make run - to compile, elaborate and open the gui of the xcelium
+# make show_files - Design files, Testbench/UVM file, Useful for debugging compile order and 			    missing files.
