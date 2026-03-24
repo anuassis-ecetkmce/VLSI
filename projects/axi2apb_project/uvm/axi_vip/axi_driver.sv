@@ -135,7 +135,7 @@ class axi_driver extends uvm_driver #(axi_transaction);
     axi_vif.cb.BREADY <= 1;
 
     do @(axi_vif.cb);
-    while(!(axi_vif.cb.BVALID && axi_vif.cb.BREADY));
+    while(!(axi_vif.cb.BVALID));
 
     tr.resp = axi_vif.cb.BRESP;
 

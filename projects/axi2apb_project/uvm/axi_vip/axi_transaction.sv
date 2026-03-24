@@ -59,10 +59,10 @@ class axi_transaction extends uvm_sequence_item;
 
   constraint c_default_delays {
 
-    pre_addr_delay       dist {0:/70,[1:5]:/20,[6:20]:/10};
-    addr_to_data_gap     dist {0:/70,[1:5]:/20,[6:20]:/10};
-    inter_beat_delay     dist {0:/80,[1:3]:/20};
-    wait_for_bresp_delay dist {0:/90,[1:5]:/10};
+    soft pre_addr_delay       dist {0:/70,[1:5]:/20,[6:20]:/10};
+    soft addr_to_data_gap     dist {0:/70,[1:5]:/20,[6:20]:/10};
+    soft inter_beat_delay     dist {0:/80,[1:3]:/20};
+    soft wait_for_bresp_delay dist {0:/90,[1:5]:/10};
 
   }
 

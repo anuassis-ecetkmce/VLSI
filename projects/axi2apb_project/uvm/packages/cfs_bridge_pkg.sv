@@ -10,6 +10,7 @@
 		import cfs_apb_pkg::*;
 		import axi_pkg::*;
 
+		`include "scoreboard.sv"
 		`include "cfs_bridge_env.sv"
 		
 	endpackage

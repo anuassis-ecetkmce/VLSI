@@ -21,6 +21,7 @@ package axi_pkg;
 	`include "axi_sequencer.sv"
 	`include "axi_driver.sv"
 	`include "axi_monitor.sv"
+	`include "axi_bridge_coverage.sv"
 	`include "axi_agent.sv"
 
 	`include "axi_sequence_base.sv"

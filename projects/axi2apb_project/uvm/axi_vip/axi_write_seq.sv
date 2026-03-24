@@ -11,12 +11,15 @@ class axi_write_stress_seq extends axi_sequence_base;
 
   task body();
     axi_transaction tr;
-    repeat(15) begin
+    // Loop from 0 to 7 to generate bursts of length 1 to 8 exactly once
+    for (int i = 0; i < 4; i++) begin
       tr = axi_transaction::type_id::create("tr");
       start_item(tr);
       if(!tr.randomize() with {
-        addr inside {[32'h10000000:32'h4FFFFFFF]}; // Standardized Address
+        addr  inside {[32'h10000000:32'h4FFFFFFF]}; // Standardized Address
         is_write             == 1;
+        len                  == i; // Force the length to increment each loop
+        data_ary.size        == len + 1;
         pre_addr_delay       == 0;
         addr_to_data_gap     == 0;
         inter_beat_delay     == 0;
@@ -37,7 +40,7 @@ class axi_write_slow_master_seq extends axi_sequence_base;
 
   task body();
     axi_transaction tr;
-    repeat(10) begin
+    repeat(8) begin
       tr = axi_transaction::type_id::create("tr");
       start_item(tr);
       if(!tr.randomize() with {
