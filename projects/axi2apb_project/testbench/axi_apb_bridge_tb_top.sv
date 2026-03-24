@@ -30,6 +30,8 @@ cfs_apb_if apb_if (
   .pclk(axi_aclk)
 );
 
+assign apb_if.presetn = axi_aresetn;
+
 // DUT instantiation
 
 axi_apb_write_bridge_top #(

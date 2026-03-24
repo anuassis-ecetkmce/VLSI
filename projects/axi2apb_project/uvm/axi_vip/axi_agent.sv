@@ -9,12 +9,13 @@ class axi_agent extends uvm_agent;
   `uvm_component_utils(axi_agent)
 
   // AXI agent components
-  axi_driver     driver;
-  axi_sequencer  sequencer;
-  axi_monitor    monitor;
+  axi_driver                driver;
+  axi_sequencer             sequencer;
+  axi_monitor               monitor;
+  axi_coverage_subscriber   coverage;
 
   // Configuration object
-  axi_agent_config axi_cfg;
+  axi_agent_config          axi_cfg;
 
   // Constructor
   function new(string name, uvm_component parent);
@@ -30,6 +31,10 @@ class axi_agent extends uvm_agent;
 
     // Monitor is always created
     monitor = axi_monitor::type_id::create("monitor", this);
+
+    if (axi_cfg.enable_coverage) begin
+      coverage = axi_coverage_subscriber::type_id::create("coverage", this);
+    end
 
     // Active agent: create driver and sequencer
     if (axi_cfg.get_active_passive() == UVM_ACTIVE) begin
@@ -68,6 +73,10 @@ class axi_agent extends uvm_agent;
 
        // OR if you use sub-component config_db setting (Legacy way):
       uvm_config_db#(virtual axi_if)::set(this, "driver", "vif", axi_cfg.get_axi_vif());
+    end
+
+    if (axi_cfg.enable_coverage) begin
+      monitor.axi_ap.connect(coverage.analysis_export);
     end
 
     // Also set for monitor if using config_db method

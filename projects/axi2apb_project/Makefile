@@ -53,7 +53,7 @@ WORKLIB = worklib
 
 # ---- Xcelium binary & options ----
 XRUN = xrun
-XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps
+XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps -coverage all -covoverwrite
 XRUN_UVM = -uvm -uvmhome CDNS-1.2 # xcelium UVM switch (adjust if your version differs)
 
 # We tell xrun to look inside these folders when it sees an `include "file.sv"
@@ -114,7 +114,7 @@ show_files:
 
 # Remove simulation outputs
 clean:
-	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err
+	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err cov_work
 
 
 #commands to run the makefile

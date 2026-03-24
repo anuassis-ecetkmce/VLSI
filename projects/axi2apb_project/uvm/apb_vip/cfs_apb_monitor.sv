@@ -17,6 +17,9 @@ class cfs_apb_monitor extends uvm_monitor;
   endfunction
   
   virtual task run_phase(uvm_phase phase);
+    cfs_apb_vif apb_vif = apb_agent_config.get_apb_vif();
+
+    wait(apb_vif.presetn === 1'b1);
     collect_transactions();
   endtask
   
@@ -32,10 +35,10 @@ class cfs_apb_monitor extends uvm_monitor;
   	cfs_apb_vif apb_vif = apb_agent_config.get_apb_vif();
     cfs_apb_item_mon item = cfs_apb_item_mon::type_id::create("item");
     
-    while(apb_vif.psel !== 1) begin
+    do begin
       @(posedge apb_vif.pclk);
       item.prev_item_delay++;
-    end
+    end while (!(apb_vif.psel !== '0 && apb_vif.penable === 1'b0));
     
     item.addr = apb_vif.paddr;
     item.dir = cfs_apb_dir'(apb_vif.pwrite);
@@ -46,13 +49,10 @@ class cfs_apb_monitor extends uvm_monitor;
     
     item.length = 1;
     
-    @(posedge apb_vif.pclk);
-    item.length++;
-    
-    while(apb_vif.pready !== 1) begin
+    do begin
       @(posedge apb_vif.pclk);
       item.length++;
-    end
+    end while (!(apb_vif.penable === 1'b1 && apb_vif.pready === 1'b1));
     
     item.response = cfs_apb_response'(apb_vif.pslverr);
     

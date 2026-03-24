@@ -5,3 +5,4 @@ waves.shm
 *.history
 .simvision
 *.vcd
+cov_work

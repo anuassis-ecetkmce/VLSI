@@ -17,18 +17,29 @@
           
 			#300ns
           
-          		//begin
-                //  axi_sequence_rw seq_rw = axi_sequence_rw::type_id::create("seq_rw");
+          		begin
+                  axi_sequence_rw seq_rw = axi_sequence_rw::type_id::create("seq_rw");
 
-                //  void'(seq_rw.randomize() with{num_trans == 6;});
-                //  seq_rw.start(env.axi_agent1.sequencer);
+                  void'(seq_rw.randomize() with{num_trans == 6;});
+                  seq_rw.start(env.axi_agent1.sequencer);
 
-            	//end
+            	end
+
+            	#100ns
+
+            	//begin
+                //  axi_write_slow_master_seq seq_slow_wr = axi_write_slow_master_seq::type_id::create("seq_slow_wr");
+
+                  //void'(seq_write.randomize());
+                //  seq_slow_wr.start(env.axi_agent1.sequencer);
+                //end
+
+                #100ns
 
             	begin
                   axi_write_stress_seq seq_write = axi_write_stress_seq::type_id::create("seq_write");
 
-                  //void'(seq_write.randomize());
+                //  void'(seq_write.randomize());
                   seq_write.start(env.axi_agent1.sequencer);
                 end
           
