@@ -34,7 +34,7 @@ assign apb_if.presetn = axi_aresetn;
 
 // DUT instantiation
 
-axi_apb_write_bridge_top #(
+axi_apb_read_bridge_top #(
   .ADDR_WIDTH(32),
   .DATA_WIDTH(32),
   .ID_WIDTH(4)
@@ -45,26 +45,43 @@ axi_apb_write_bridge_top #(
   .rst_n 	(axi_aresetn),
 
   // AXI4 Write Address Channel
-  .awvalid     (axi_if.AWVALID),
-  .awready     (axi_if.AWREADY),
-  .awaddr      (axi_if.AWADDR),
-  .awsize      (axi_if.AWSIZE),
-  .awlen       (axi_if.AWLEN),
-  .awburst     (axi_if.AWBURST),
-  .awid        (axi_if.AWID),
+  //.awvalid     (axi_if.AWVALID),
+  //.awready     (axi_if.AWREADY),
+  //.awaddr      (axi_if.AWADDR),
+  //.awsize      (axi_if.AWSIZE),
+  //.awlen       (axi_if.AWLEN),
+  //.awburst     (axi_if.AWBURST),
+  //.awid        (axi_if.AWID),
 
   // AXI4 Write Data Channel
-  .wvalid      (axi_if.WVALID),
-  .wready      (axi_if.WREADY),
-  .wdata       (axi_if.WDATA),
-  .wstrb       (axi_if.WSTRB),
-  .wlast       (axi_if.WLAST),
+  //.wvalid      (axi_if.WVALID),
+  //.wready      (axi_if.WREADY),
+  //.wdata       (axi_if.WDATA),
+  //.wstrb       (axi_if.WSTRB),
+  //.wlast       (axi_if.WLAST),
 
   // AXI4 Write Response Channel
-  .bvalid      (axi_if.BVALID),
-  .bready      (axi_if.BREADY),
-  .bresp       (axi_if.BRESP),
-  .bid         (axi_if.BID),
+  //.bvalid      (axi_if.BVALID),
+  //.bready      (axi_if.BREADY),
+  //.bresp       (axi_if.BRESP),
+  //.bid         (axi_if.BID),
+
+  // AXI4 Read Address Channel
+  .arvalid     (axi_if.ARVALID),
+  .arready     (axi_if.ARREADY),
+  .araddr      (axi_if.ARADDR),
+  .arsize      (axi_if.ARSIZE),
+  .arlen       (axi_if.ARLEN),
+  .arburst     (axi_if.ARBURST),
+  .arid        (axi_if.ARID),
+
+  // AXI4 Read Data Channel
+  .rvalid      (axi_if.RVALID),
+  .rready      (axi_if.RREADY),
+  .rdata       (axi_if.RDATA),
+  .rresp       (axi_if.RRESP),
+  .rid         (axi_if.RID),
+  .rlast       (axi_if.RLAST),
 
   //APB CLOCK & RESET
   //.clk		(apb_pclk),
@@ -74,11 +91,12 @@ axi_apb_write_bridge_top #(
   .psel        (apb_if.psel),
   .penable     (apb_if.penable),
   .paddr       (apb_if.paddr),
-  .pwdata      (apb_if.pwdata),
-  .pstrb       (apb_if.pstrb),
   .pwrite      (apb_if.pwrite),
   .pready      (apb_if.pready),
-  .pslverr     (apb_if.pslverr)
+  .pslverr     (apb_if.pslverr),
+  //.pwdata      (apb_if.pwdata),
+  //.pstrb       (apb_if.pstrb),
+  .prdata      (apb_if.prdata)
 );
 
 

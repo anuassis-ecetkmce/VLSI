@@ -30,7 +30,7 @@ module axi_hold_reg #(
     // FIX 1: Only assert ready when NOT occupied AND NOT in the middle of a
     // push. This ensures the master cannot send new data on the same cycle
     // the current hold data moves into the FIFO.
-    assign in_ready = !occupied || push;
+    assign in_ready = !occupied;
 
     // Push fires when we are holding data and the FIFO has room.
     assign push = occupied && !fifo_full;

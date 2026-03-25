@@ -36,12 +36,12 @@
 
                 #100ns
 
-            	begin
-                  axi_write_stress_seq seq_write = axi_write_stress_seq::type_id::create("seq_write");
+            	//begin
+                //  axi_write_stress_seq seq_write = axi_write_stress_seq::type_id::create("seq_write");
 
                 //  void'(seq_write.randomize());
-                  seq_write.start(env.axi_agent1.sequencer);
-                end
+                //  seq_write.start(env.axi_agent1.sequencer);
+                //end
           
           	`uvm_info("DEBUG", "End of test", UVM_LOW)
 			
