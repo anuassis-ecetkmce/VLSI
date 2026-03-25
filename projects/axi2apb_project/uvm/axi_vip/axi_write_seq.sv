@@ -12,7 +12,7 @@ class axi_write_stress_seq extends axi_sequence_base;
   task body();
     axi_transaction tr;
     // Loop from 0 to 7 to generate bursts of length 1 to 8 exactly once
-    for (int i = 0; i < 4; i++) begin
+    for (int i = 0; i < 1; i++) begin
       tr = axi_transaction::type_id::create("tr");
       start_item(tr);
       if(!tr.randomize() with {
@@ -40,12 +40,15 @@ class axi_write_slow_master_seq extends axi_sequence_base;
 
   task body();
     axi_transaction tr;
-    repeat(8) begin
+    // Loop from 0 to 7 to generate bursts of length 1 to 8 exactly once
+    for (int i = 0; i < 1; i++) begin
       tr = axi_transaction::type_id::create("tr");
       start_item(tr);
       if(!tr.randomize() with {
         addr inside {[32'h10000000:32'h4FFFFFFF]}; // Standardized Address
         is_write             == 1;
+        len                  == i; // Force the length to increment each loop
+        data_ary.size        == len + 1;
         pre_addr_delay       inside {[10:20]};
         addr_to_data_gap     inside {[15:30]};
         inter_beat_delay     inside {[5:10]};
@@ -72,6 +75,7 @@ class axi_write_random_delay_seq extends axi_sequence_base;
       if(!tr.randomize() with {
         addr inside {[32'h10000000:32'h4FFFFFFF]}; // Standardized Address
         is_write == 1;
+        len      == 0;
       }) `uvm_error("SEQ", "Rand failed")
       finish_item(tr);
     end

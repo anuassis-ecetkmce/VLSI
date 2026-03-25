@@ -1,0 +1,39 @@
+------------------------------------------------------------------
+Name                       Type                        Size  Value
+------------------------------------------------------------------
+uvm_test_top               cfs_bridge_test_reg_access  -     @2007
+  env                      cfs_bridge_env              -     @2073
+    apb_agent              cfs_apb_agent               -     @2105
+      agent_config         cfs_apb_agent_config        -     @2200
+      driver               cfs_apb_driver              -     @2972
+        rsp_port           uvm_analysis_port           -     @3073
+        seq_item_port      uvm_seq_item_pull_port      -     @3023
+      monitor              cfs_apb_monitor             -     @2233
+        output_port        uvm_analysis_port           -     @2284
+      sequencer            cfs_apb_sequencer           -     @2317
+        rsp_export         uvm_analysis_export         -     @2377
+        seq_item_export    uvm_seq_item_pull_imp       -     @2939
+        arbitration_queue  array                       0     -    
+        lock_queue         array                       0     -    
+        num_last_reqs      integral                    32    'd1  
+        num_last_rsps      integral                    32    'd1  
+    axi_agent              axi_agent                   -     @2136
+      cfg                  axi_agent_config            -     @3127
+      coverage             axi_coverage_subscriber     -     @3244
+        analysis_imp       uvm_analysis_imp            -     @3294
+      driver               axi_driver                  -     @3274
+        rsp_port           uvm_analysis_port           -     @3428
+        seq_item_port      uvm_seq_item_pull_port      -     @3376
+      monitor              axi_monitor                 -     @3161
+        axi_ap             uvm_analysis_port           -     @3211
+      sequencer            axi_sequencer               -     @3459
+        rsp_export         uvm_analysis_export         -     @3518
+        seq_item_export    uvm_seq_item_pull_imp       -     @4078
+        arbitration_queue  array                       0     -    
+        lock_queue         array                       0     -    
+        num_last_reqs      integral                    32    'd1  
+        num_last_rsps      integral                    32    'd1  
+    scb                    axi2apb_scoreboard          -     @2167
+      apb_export           uvm_analysis_imp_apb        -     @4202
+      axi_export           uvm_analysis_imp_axi        -     @4152
+------------------------------------------------------------------
