@@ -16,12 +16,7 @@ TESTS_DIR     = $(UVM_DIR)/tests
  $(DESIGN_DIR)/top/axi_apb_write_bridge_top.sv \
 
 DESIGN_SRCS = \
-$(DESIGN_DIR)/common/axi_hold_reg.sv \
-$(DESIGN_DIR)/common/sync_fifo.sv \
-$(DESIGN_DIR)/axi_interface/axi_read_input_stage.sv \
-$(DESIGN_DIR)/apb_interface/read_transaction_engine.sv \
-$(DESIGN_DIR)/response/axi_read_data_stage.sv \
-$(DESIGN_DIR)/top/axi_apb_read_bridge_top.sv \
+  $(DESIGN_DIR)/design.sv \
 
 #Add other design files here
 

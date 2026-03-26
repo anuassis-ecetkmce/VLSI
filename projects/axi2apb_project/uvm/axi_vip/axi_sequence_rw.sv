@@ -32,25 +32,25 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
     for (int unsigned i = 0; i < num_trans; i++) begin
 
       // ---- AXI WRITE ----
-      //tr = axi_transaction::type_id::create("axi_write");
+      tr = axi_transaction::type_id::create("axi_write");
 
 
       // Write config
-      //tr.is_write = 1;
-      //tr.addr     = base_addr + (i * addr_stride);
-      //tr.len      = 0;               // single beat
-      //tr.size     = AXI_SIZE_4B;     // 4 bytes
-      //tr.burst    = AXI_BURST_INCR;
-      //tr.alloc_data_array();
+      tr.is_write = 1;
+      tr.addr     = base_addr + (i * addr_stride);
+      tr.len      = 0;               // single beat
+      tr.size     = AXI_SIZE_4B;     // 4 bytes
+      tr.burst    = AXI_BURST_INCR;
+      tr.alloc_data_array();
 
       // Fill write data
-      //tr.data_ary[0] = $urandom;
+      tr.data_ary[0] = $urandom;
 
       // send to driver
-      //start_item(tr);
-      //finish_item(tr);
+      start_item(tr);
+      finish_item(tr);
 
-      //`uvm_info("AXI_SEQ_RW", $sformatf("Sent WRITE tr: addr=0x%0h data=0x%0h", tr.addr, tr.data_ary[0]), UVM_MEDIUM)
+      `uvm_info("AXI_SEQ_RW", $sformatf("Sent WRITE tr: addr=0x%0h data=0x%0h", tr.addr, tr.data_ary[0]), UVM_MEDIUM)
 
       // ---- AXI READ ----
       tr = axi_transaction::type_id::create("axi_read");

@@ -26,11 +26,11 @@
 			end
 
 			#100ns
-			begin
-				axi_random_read_seq seq_rand_rd = axi_random_read_seq::type_id::create("seq_rand_rd");
+			//begin
+			//	axi_random_read_seq seq_rand_rd = axi_random_read_seq::type_id::create("seq_rand_rd");
 
-                seq_rand_rd.start(env.axi_agent1.sequencer);
-			end
+            //    seq_rand_rd.start(env.axi_agent1.sequencer);
+			//end
 
             	//begin
                 //  axi_write_slow_master_seq seq_slow_wr = axi_write_slow_master_seq::type_id::create("seq_slow_wr");
