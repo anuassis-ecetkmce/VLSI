@@ -21,10 +21,13 @@ package axi_pkg;
 	`include "axi_sequencer.sv"
 	`include "axi_driver.sv"
 	`include "axi_monitor.sv"
+	`include "axi_bridge_coverage.sv"
 	`include "axi_agent.sv"
 
 	`include "axi_sequence_base.sv"
 	`include "axi_sequence_rw.sv"
+	`include "axi_write_seq.sv"
+	`include "axi_random_read_seq.sv"
 
 	// Add more includes as needed for all APB files
 

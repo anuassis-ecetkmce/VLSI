@@ -8,11 +8,17 @@ ENV_DIR       = $(UVM_DIR)/env
 TESTS_DIR     = $(UVM_DIR)/tests
 
 #DESIGN (RTL first)
+#$(DESIGN_DIR)/common/axi_hold_reg.sv \
+ $(DESIGN_DIR)/common/sync_fifo.sv \
+ $(DESIGN_DIR)/axi_interface/axi_input_stage.sv \
+ $(DESIGN_DIR)/apb_interface/write_transaction_engine.sv \
+ $(DESIGN_DIR)/response/axi_response_stage.sv \
+ $(DESIGN_DIR)/top/axi_apb_write_bridge_top.sv \
+
 DESIGN_SRCS = \
-$(DESIGN_DIR)/axi_apb_write_path_top.sv \
-$(DESIGN_DIR)/axi_input_stage.sv \
-$(DESIGN_DIR)/write_transaction_complete.sv \
-# Add other design files here
+  $(DESIGN_DIR)/design.sv \
+
+#Add other design files here
 
 #INTERFACES
 IF_SRCS = \
@@ -41,12 +47,15 @@ ALL_SRCS = \
 # Change tb_top to your actual top module, e.g. seq_tb or axi2apb_tb
 TB_TOP = axi_apb_bridge_tb_top
 
+#UVM test name
+UVM_TEST ?= cfs_bridge_test_reg_access
+
 # Work library
 WORKLIB = worklib
 
 # ---- Xcelium binary & options ----
 XRUN = xrun
-XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps
+XRUN_COMMON = -64bit -access +rwc -licqueue -timescale 1ns/1ps -coverage all -covoverwrite
 XRUN_UVM = -uvm -uvmhome CDNS-1.2 # xcelium UVM switch (adjust if your version differs)
 
 # We tell xrun to look inside these folders when it sees an `include "file.sv"
@@ -87,13 +96,15 @@ compile:
 run: compile
 	$(XRUN) -R \
 	-work $(WORKLIB) \
-	$(XRUN_COMMON)
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
 
 # GUI Mode
 gui: compile
 	$(XRUN) -R -gui \
 	-work $(WORKLIB) \
-	$(XRUN_COMMON)
+	$(XRUN_COMMON) \
+	+UVM_TESTNAME=$(UVM_TEST)
 
 # Show what files the Makefile will compile (good for debugging)
 show_files:
@@ -105,7 +116,7 @@ show_files:
 
 # Remove simulation outputs
 clean:
-	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err
+	rm -rf $(WORKLIB) xcelium.d xrun.history xrun.log waves.shm *.shm *.key *.err cov_work
 
 
 #commands to run the makefile

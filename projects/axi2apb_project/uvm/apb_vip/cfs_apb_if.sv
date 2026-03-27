@@ -12,7 +12,7 @@
 	interface cfs_apb_if(input pclk);
 
       logic presetn;
-      logic psel;
+      logic [3:0] psel;
       logic [2:0] pprot;
       logic penable;
       logic pwrite;

@@ -39,7 +39,7 @@ class cfs_apb_agent_config extends uvm_component;
     
     // Error injection configuration
     bit enable_error_injection = 0;
-    int unsigned error_injection_percentage = 5;
+    int unsigned error_injection_percentage = 25;
   
   
     // Constructor

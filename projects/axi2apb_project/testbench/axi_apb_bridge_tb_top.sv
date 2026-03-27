@@ -30,12 +30,18 @@ cfs_apb_if apb_if (
   .pclk(axi_aclk)
 );
 
+assign apb_if.presetn = axi_aresetn;
+
 // DUT instantiation
 
-axi_apb_write_bridge_top #(
+axi_apb_bridge_top #(
   .ADDR_WIDTH(32),
   .DATA_WIDTH(32),
-  .ID_WIDTH(4)
+  .ID_WIDTH(4),
+  .NUM_SLAVES(4),
+  .STRB_W(32/8),
+  .MAX_WR_CONSEC(4),
+  .CLK_PERIOD(10)
 ) DUT (
 
   // AXI clocks & resets
@@ -64,6 +70,23 @@ axi_apb_write_bridge_top #(
   .bresp       (axi_if.BRESP),
   .bid         (axi_if.BID),
 
+  // AXI4 Read Address Channel
+  .arvalid     (axi_if.ARVALID),
+  .arready     (axi_if.ARREADY),
+  .araddr      (axi_if.ARADDR),
+  .arsize      (axi_if.ARSIZE),
+  .arlen       (axi_if.ARLEN),
+  .arburst     (axi_if.ARBURST),
+  .arid        (axi_if.ARID),
+
+  // AXI4 Read Data Channel
+  .rvalid      (axi_if.RVALID),
+  .rready      (axi_if.RREADY),
+  .rdata       (axi_if.RDATA),
+  .rresp       (axi_if.RRESP),
+  .rid         (axi_if.RID),
+  .rlast       (axi_if.RLAST),
+
   //APB CLOCK & RESET
   //.clk		(apb_pclk),
   //.rst_n	(apb_presetn),
@@ -72,11 +95,12 @@ axi_apb_write_bridge_top #(
   .psel        (apb_if.psel),
   .penable     (apb_if.penable),
   .paddr       (apb_if.paddr),
-  .pwdata      (apb_if.pwdata),
-  .pstrb       (apb_if.pstrb),
   .pwrite      (apb_if.pwrite),
   .pready      (apb_if.pready),
-  .pslverr     (apb_if.pslverr)
+  .pslverr     (apb_if.pslverr),
+  .pwdata      (apb_if.pwdata),
+  .pstrb       (apb_if.pstrb),
+  .prdata      (apb_if.prdata)
 );
 
 
