@@ -5,6 +5,9 @@
       	cfs_apb_agent apb_agent;
       	axi_agent axi_agent1;
 		axi2apb_scoreboard scb;
+
+		//Instantiate Virtual Sequencer
+		cfs_bridge_virtual_sequencer v_sqr;
 	
 		`uvm_component_utils(cfs_bridge_env)
 	
@@ -21,6 +24,9 @@
 		  // Create the scoreboard
 		  scb = axi2apb_scoreboard::type_id::create("scb", this);
 
+		  //Build the virtual sequencer
+		  v_sqr = cfs_bridge_virtual_sequencer::type_id::create("v_sqr", this);
+
 		endfunction
 
 		// Connect Phase: Connect monitor ports to scoreboard exports
@@ -28,12 +34,16 @@
 			super.connect_phase(phase);
 
 			// CONNECT AXI MONITOR TO SCOREBOARD
-			// Replace 'analysis_port' with the actual name of the port in your AXI monitor
 			axi_agent1.monitor.axi_ap.connect(scb.axi_export);
 
 			// CONNECT APB MONITOR TO SCOREBOARD
-			// Replace 'analysis_port' with the actual name of the port in your APB monitor
 			apb_agent.monitor.output_port.connect(scb.apb_export);
+
+			//Connect the pointers to the actual sequencers
+			if(axi_agent1.sequencer != null)
+				v_sqr.axi_sqr = axi_agent1.sequencer;
+			if(apb_agent.sequencer != null)
+				v_sqr.apb_sqr = apb_agent.sequencer;
 
 		endfunction
 

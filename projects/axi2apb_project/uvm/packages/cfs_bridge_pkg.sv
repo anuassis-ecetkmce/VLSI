@@ -12,6 +12,7 @@
 
 		`include "scoreboard.sv"
 		`include "cfs_bridge_env.sv"
+		`include "cfs_bridge_virtual_sequencer.sv"
 		
 	endpackage
 	
