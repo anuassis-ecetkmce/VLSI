@@ -25,6 +25,27 @@
 
 			end
 
+			#200ns
+			begin
+				axi_write_stress_seq seq_write = axi_write_stress_seq::type_id::create("seq_write");
+
+				seq_write.start(env.axi_agent1.sequencer);
+			end
+
+			#200ns
+			begin
+				axi_write_slow_master_seq seq_slow_wr = axi_write_slow_master_seq::type_id::create("seq_slow_wr");
+
+				seq_slow_wr.start(env.axi_agent1.sequencer);
+			end
+
+			#200ns
+			begin
+				axi_write_random_delay_seq seq_rand_wr = axi_write_random_delay_seq::type_id::create("seq_rand_wr");
+
+				seq_rand_wr.start(env.axi_agent1.sequencer);
+			end
+
 			#100ns
 			//begin
 			//	axi_random_read_seq seq_rand_rd = axi_random_read_seq::type_id::create("seq_rand_rd");
@@ -32,21 +53,7 @@
             //    seq_rand_rd.start(env.axi_agent1.sequencer);
 			//end
 
-            	//begin
-                //  axi_write_slow_master_seq seq_slow_wr = axi_write_slow_master_seq::type_id::create("seq_slow_wr");
 
-                  //void'(seq_write.randomize());
-                //  seq_slow_wr.start(env.axi_agent1.sequencer);
-                //end
-
-                #100ns
-
-            	//begin
-                //  axi_write_stress_seq seq_write = axi_write_stress_seq::type_id::create("seq_write");
-
-                //  void'(seq_write.randomize());
-                //  seq_write.start(env.axi_agent1.sequencer);
-                //end
           
           	`uvm_info("DEBUG", "End of test", UVM_LOW)
 			
