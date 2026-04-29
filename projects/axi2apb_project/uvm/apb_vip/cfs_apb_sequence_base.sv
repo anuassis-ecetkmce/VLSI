@@ -3,8 +3,6 @@
 
 class cfs_apb_sequence_base extends uvm_sequence#(.REQ(cfs_apb_item_drv));
   
-  `uvm_declare_p_sequencer(cfs_apb_sequencer)
-  
   `uvm_object_utils(cfs_apb_sequence_base)
   
   function new(string name = "");

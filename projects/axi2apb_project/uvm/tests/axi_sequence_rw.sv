@@ -74,3 +74,4 @@ class axi_sequence_rw extends uvm_sequence #(axi_transaction);
 endclass : axi_sequence_rw
 
 `endif // AXI_SEQUENCE_RW_SV
+

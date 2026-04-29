@@ -11,6 +11,7 @@
 		import axi_pkg::*;
 
 		`include "scoreboard.sv"
+		`include "cfs_bridge_virtual_sequencer.sv"
 		`include "cfs_bridge_env.sv"
 		
 	endpackage

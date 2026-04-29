@@ -12,7 +12,7 @@ package axi_pkg;
 	import uvm_pkg::*;
 	import axi_types_pkg::*;
 
-	// Include all APB side files
+	// Include all AXI side files
 
 	`include "axi_transaction.sv"
 	`include "axi_item_drv.sv"
@@ -25,11 +25,6 @@ package axi_pkg;
 	`include "axi_agent.sv"
 
 	`include "axi_sequence_base.sv"
-	`include "axi_sequence_rw.sv"
-	`include "axi_write_seq.sv"
-	`include "axi_random_read_seq.sv"
-
-	// Add more includes as needed for all APB files
 
 endpackage
 
