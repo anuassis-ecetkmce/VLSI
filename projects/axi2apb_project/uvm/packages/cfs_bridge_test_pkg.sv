@@ -10,9 +10,10 @@
 		import cfs_bridge_pkg::*;
 		import cfs_apb_pkg::*;
 		import axi_pkg::*;
+		import axi_types_pkg::*;
 
 		`include "axi_sequence_rw.sv"
-		`include "axi_write_seq.sv"
+		`include "axi_write_sequence.sv"
 		`include "axi_random_read_seq.sv"
 
 		`include "cfs_bridge_virtual_sequence.sv"
