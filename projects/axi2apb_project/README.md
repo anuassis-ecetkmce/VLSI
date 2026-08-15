@@ -75,27 +75,27 @@ AXI Master
     ├─── AW + W channels ──► axi_input_stage      ──► FIFO (cmd + data)
     │                                                         │
     │                                              ┌──────────▼──────────┐
-    │                                              │   apb_arbiter        │
-    │                                              │ (wr-priority +       │
-    │                                              │  starvation guard)   │
+    │                                              │   apb_arbiter       │
+    │                                              │ (wr-priority +      │
+    │                                              │  starvation guard)  │
     │                                              └──────────┬──────────┘
     │                                                         │
-    ├─── AR channel ────────► axi_read_input_stage ──► FIFO  │
+    ├─── AR channel ────────► axi_read_input_stage ──► FIFO   │
     │                                                         │
     │                                              ┌──────────▼──────────┐
-    │                                              │ unified_transaction  │
-    │                                              │ _engine (FSM)        │
-    │                                              │                      │
-    │                                              │  IDLE→SETUP→DECODE   │
-    │                                              │  →ENABLE→ACCESS      │
-    │                                              │  →[WAIT/RESP_STALL   │
-    │                                              │   /ERROR]→IDLE       │
-    │                                              └────┬────────┬────────┘
+    │                                              │ unified_transaction │
+    │                                              │ _engine (FSM)       │
+    │                                              │                     │
+    │                                              │  IDLE→SETUP→DECODE  │
+    │                                              │  →ENABLE→ACCESS     │
+    │                                              │  →[WAIT/RESP_STALL  │
+    │                                              │   /ERROR]→IDLE      │
+    │                                              └────┬────────┬───────┘
     │                                                   │        │
-    ├─── B channel ◄─────────── axi_response_stage ◄───┘        │
+    ├─── B channel ◄─────────── axi_response_stage ◄────┘        │
     │                            (write resp FIFO)               │
     │                                                            │
-    └─── R channel ◄─────────── axi_read_data_stage ◄───────────┘
+    └─── R channel ◄─────────── axi_read_data_stage ◄────────────┘
                                  (rdata FIFO)
                                         │
                                         ▼
@@ -235,26 +235,26 @@ The environment follows the standard UVM layered architecture:
 │                      cfs_bridge_env                          │
 │                                                              │
 │   ┌──────────────────┐        ┌────────────────────────┐     │
-│   │   AXI Agent      │        │      APB Agent          │    │
-│   │  (UVM_ACTIVE)    │        │     (UVM_ACTIVE)        │    │
-│   │                  │        │                         │    │
-│   │  ┌────────────┐  │        │  ┌───────────────────┐  │    │
-│   │  │ Sequencer  │  │        │  │    Sequencer       │  │    │
-│   │  ├────────────┤  │        │  ├───────────────────┤  │    │
-│   │  │   Driver   │  │        │  │      Driver        │  │    │
-│   │  ├────────────┤  │        │  ├───────────────────┤  │    │
-│   │  │  Monitor   │──┼──┐  ┌──┼──│      Monitor       │  │    │
-│   │  └────────────┘  │  │  │  │  └───────────────────┘  │    │
+│   │   AXI Agent      │        │      APB Agent         │     │
+│   │  (UVM_ACTIVE)    │        │     (UVM_ACTIVE)       │     │
+│   │                  │        │                        │     │
+│   │  ┌────────────┐  │        │  ┌───────────────────┐ │     │
+│   │  │ Sequencer  │  │        │  │    Sequencer      │ │     │
+│   │  ├────────────┤  │        │  ├───────────────────┤ │     │
+│   │  │   Driver   │  │        │  │      Driver       │ │     │
+│   │  ├────────────┤  │        │  ├───────────────────┤ │     │
+│   │  │  Monitor   │──┼──┐  ┌──┼──│      Monitor      │ │     │
+│   │  └────────────┘  │  │  │  │  └───────────────────┘ │     │
 │   └──────────────────┘  │  │  └────────────────────────┘     │
-│                          │  │                                 │
-│   ┌──────────────────────▼──▼──────────────────────────┐     │
-│   │               axi2apb_scoreboard                    │     │
-│   │         (AXI ↔ APB transaction comparison)          │     │
-│   └─────────────────────────────────────────────────────┘     │
+│                         │  │                                 │
+│   ┌─────────────────────▼──▼──────────────────────────┐      │
+│   │               axi2apb_scoreboard                  │      │
+│   │         (AXI ↔ APB transaction comparison)        │      │
+│   └───────────────────────────────────────────────────┘      │
 │                                                              │
-│   ┌──────────────────────────────────────────────────────┐   │
-│   │          cfs_bridge_virtual_sequencer                 │   │
-│   └──────────────────────────────────────────────────────┘   │
+│   ┌────────────────────────────────────────────────────┐     │
+│   │          cfs_bridge_virtual_sequencer              │     │
+│   └────────────────────────────────────────────────────┘     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
